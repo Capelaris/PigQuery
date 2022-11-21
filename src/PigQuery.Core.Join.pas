@@ -3,37 +3,38 @@ unit PigQuery.Core.Join;
 interface
 
 uses
-  CowORM.Commons, CowORM.Helpers, CowORM.Core.QueryCondition, CowORM.Core.Tables;
+  PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers,
+  PigQuery.Core.Condition, PigQuery.Core.Table;
 
 type
-  TQueryJoin = class(TObject)
+  TJoin = class(TObject)
   private
     tJoinType  : TJoinType;
-    oTable     : TTable;
-    aConditions: TArray<TQueryCondition>;
+    oTable     : ITable;
+    aConditions: TArray<ICondition>;
 
     function GetType: string;
   public
-    constructor Create(pJoinType: TJoinType; pTable: TTable;
-      pConditions: TArray<TQueryCondition>); overload;
+    constructor Create(pJoinType: TJoinType; pTable: ITable;
+      pConditions: TArray<ICondition>); overload;
     constructor Create(pJoinType: TJoinType; pTable: string;
-      pConditions: TArray<TQueryCondition>); overload;
-    constructor Create(pTable: TTable; pConditions: TArray<TQueryCondition>); overload;
-    constructor Create(pTable: string; pConditions: TArray<TQueryCondition>); overload;
+      pConditions: TArray<ICondition>); overload;
+    constructor Create(pTable: ITable; pConditions: TArray<ICondition>); overload;
+    constructor Create(pTable: string; pConditions: TArray<TQueryICondition>); overload;
 
     function GenerateSQL(pSpaces: Integer = 0; pTableLabel: string = ''): string;
 
-    property JoinType  : TJoinType               read tJoinType   write tJoinType;
-    property Table     : TTable                  read oTable      write oTable;
-    property Conditions: TArray<TQueryCondition> read aConditions write aConditions;
+    property JoinType  : TJoinType          read tJoinType   write tJoinType;
+    property Table     : ITable             read oTable      write oTable;
+    property Conditions: TArray<ICondition> read aConditions write aConditions;
   end;
 
 implementation
 
-{ TQueryJoin }
+{ TJoin }
 
-constructor TQueryJoin.Create(pJoinType: TJoinType; pTable: TTable;
-  pConditions: TArray<TQueryCondition>);
+constructor TJoin.Create(pJoinType: TJoinType; pTable: ITable;
+  pConditions: TArray<ICondition>);
 begin
   inherited Create;
   tJoinType   := pJoinType;
@@ -41,36 +42,36 @@ begin
   aConditions := pConditions;
 end;
 
-constructor TQueryJoin.Create(pJoinType: TJoinType; pTable: string;
-  pConditions: TArray<TQueryCondition>);
+constructor TJoin.Create(pJoinType: TJoinType; pTable: string;
+  pConditions: TArray<ICondition>);
 begin
   Create(pJoinType, TTable.Create(pTable), pConditions);
 end;
 
-constructor TQueryJoin.Create(pTable: TTable;
-  pConditions: TArray<TQueryCondition>);
+constructor TJoin.Create(pTable: ITable;
+  pConditions: TArray<ICondition>);
 begin
   Create(jtNone, pTable, pConditions);
 end;
 
-constructor TQueryJoin.Create(pTable: string;
-  pConditions: TArray<TQueryCondition>);
+constructor TJoin.Create(pTable: string;
+  pConditions: TArray<ICondition>);
 begin
   Create(jtNone, TTable.Create(pTable), pConditions);
 end;
 
-function TQueryJoin.GenerateSQL(pSpaces: Integer; pTableLabel: string): string;
+function TJoin.GenerateSQL(pSpaces: Integer; pTableLabel: string): string;
 var
   i: Integer;
 begin
-  Result := Spaces(pSpaces) + GetType + oTable.Name + ' ' +
-      Coalesce([pTableLabel, oTable.Alias]) + ' on';
+  Result := Spaces(pSpaces) + GetType + oTable.GetName + ' ' +
+      Coalesce([pTableLabel, oTable.GetAlias]) + ' on';
 
   for i := 0 to (Length(aConditions) - 1) do
     Result := Result + #13#10 + aConditions[i].GenerateSQL(pSpaces, (i <> 0));
 end;
 
-function TQueryJoin.GetType: string;
+function TJoin.GetType: string;
 begin
   Result := '';
   if tJoinType = jtInner then
