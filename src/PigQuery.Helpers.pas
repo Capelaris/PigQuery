@@ -3,8 +3,8 @@ unit PigQuery.Helpers;
 interface
 
 uses
-  PigQuery.Commons, System.StrUtils, System.Generics.Defaults, System.Math,
-  Rtti, JSON;
+  PigQuery.Commons, PigQuery.Interfaces, System.StrUtils,
+  System.Generics.Defaults, System.Math, Rtti, JSON;
 
 type
   TArrayUtils<T> = class
@@ -12,6 +12,7 @@ type
     class procedure Append(var Arr: TArray<T>; Values: TArray<T>); overload;
     class function Contains(const anArray: array of T; const x: T) : Boolean;
     class function Count(const anArray: array of T; const x: T) : Integer;
+    class function SerializeArray(Arr: TArray<T>): TJSONArray;
   end;
 
 function GetWords(Text: string): TArray<string>;
@@ -19,7 +20,6 @@ function Spaces(Number: Integer = 0): string;
 function Coalesce(Values: TArray<string>): string;
 function GetTableLabel(Index: Integer): string;
 function GetTValueJSONValue(Value: TValue): TJSONValue;
-function GetFieldTypeStr(Value: TColumnType): string;
 
 implementation
 
@@ -84,11 +84,6 @@ begin
 
 end;
 
-function GetFieldTypeStr(Value: TColumnType): string;
-begin
-  Result := '';
-end;
-
 { TArrayUtils<T> }
 
 class procedure TArrayUtils<T>.Append(var Arr: TArray<T>; Value: T);
@@ -134,6 +129,11 @@ begin
     if lComparer.Equals(x, y) then
       Result := Result + 1;
   end;
+end;
+
+class function TArrayUtils<T>.SerializeArray(Arr: TArray<T>): TJSONArray;
+begin
+  Result := TJSONArray.Create;
 end;
 
 end.

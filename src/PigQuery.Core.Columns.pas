@@ -385,7 +385,7 @@ begin
     AddPair('Size',       TJSONNumber.Create(Self.iSize));
     AddPair('Scale',      TJSONNumber.Create(Self.iScale));
     AddPair('NotNull',    TJSONBool.Create(Self.bNotNull));
-    AddPair('FieldType',  GetFieldTypeStr(Self.tFieldType));
+    AddPair('FieldType',  Self.tFieldType.ToString);
     AddPair('Charset',    Self.sCharset);
     AddPair('Collate',    Self.sCollate);
     AddPair('DefaultVal', GetTValueJSONValue(Self.oDefaultVal));

@@ -4,29 +4,37 @@ interface
 
 uses
   PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers,
-  PigQuery.Core.Condition, PigQuery.Core.Table;
+  PigQuery.Core.Condition, PigQuery.Core.Table, JSON;
 
 type
-  TJoin = class(TObject)
+  TJoin = class(TInterfacedObject, IJoin)
   private
     tJoinType  : TJoinType;
     oTable     : ITable;
     aConditions: TArray<ICondition>;
 
     function GetType: string;
+
+    procedure SetJoinType(Value: TJoinType);
+    function GetJoinType: TJoinType;
+    procedure SetTable(Value: ITable);
+    function GetTable: ITable;
+    procedure SetConditions(Value: TArray<ICondition>);
+    function GetConditions: TArray<ICondition>;
   public
     constructor Create(pJoinType: TJoinType; pTable: ITable;
       pConditions: TArray<ICondition>); overload;
     constructor Create(pJoinType: TJoinType; pTable: string;
       pConditions: TArray<ICondition>); overload;
     constructor Create(pTable: ITable; pConditions: TArray<ICondition>); overload;
-    constructor Create(pTable: string; pConditions: TArray<TQueryICondition>); overload;
+    constructor Create(pTable: string; pConditions: TArray<ICondition>); overload;
 
     function GenerateSQL(pSpaces: Integer = 0; pTableLabel: string = ''): string;
+    function Serialize: TJSONObject;
 
-    property JoinType  : TJoinType          read tJoinType   write tJoinType;
-    property Table     : ITable             read oTable      write oTable;
-    property Conditions: TArray<ICondition> read aConditions write aConditions;
+    property JoinType  : TJoinType          read GetJoinType   write SetJoinType;
+    property Table     : ITable             read GetTable      write SetTable;
+    property Conditions: TArray<ICondition> read GetConditions write SetConditions;
   end;
 
 implementation
@@ -71,6 +79,21 @@ begin
     Result := Result + #13#10 + aConditions[i].GenerateSQL(pSpaces, (i <> 0));
 end;
 
+function TJoin.GetConditions: TArray<ICondition>;
+begin
+  Result := Self.aConditions;
+end;
+
+function TJoin.GetJoinType: TJoinType;
+begin
+  Result := Self.tJoinType;
+end;
+
+function TJoin.GetTable: ITable;
+begin
+  Result := Self.oTable;
+end;
+
 function TJoin.GetType: string;
 begin
   Result := '';
@@ -82,6 +105,32 @@ begin
     Result := 'right '
   else if tJoinType = jtOuter then
     Result := 'outer ';
+end;
+
+function TJoin.Serialize: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  with Result do
+  begin
+    AddPair('Type', Self.tJoinType.ToString);
+    AddPair('Table', Self.oTable.Serialize);
+    AddPair('Conditions', TArrayUtils<ICondition>.SerializeArray(Self.aConditions));
+  end;
+end;
+
+procedure TJoin.SetConditions(Value: TArray<ICondition>);
+begin
+  Self.aConditions := Value;
+end;
+
+procedure TJoin.SetJoinType(Value: TJoinType);
+begin
+  Self.tJoinType := Value;
+end;
+
+procedure TJoin.SetTable(Value: ITable);
+begin
+  Self.oTable := Value;
 end;
 
 end.

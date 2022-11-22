@@ -11,7 +11,10 @@ uses
   PigQuery.Helpers in '..\..\src\PigQuery.Helpers.pas',
   PigQuery.Interfaces in '..\..\src\PigQuery.Interfaces.pas',
   PigQuery.Core.Param in '..\..\src\PigQuery.Core.Param.pas',
-  PigQuery.Core.Join in '..\..\src\PigQuery.Core.Join.pas';
+  PigQuery.Core.Join in '..\..\src\PigQuery.Core.Join.pas',
+  PigQuery.Core.Condition in '..\..\src\PigQuery.Core.Condition.pas',
+  PigQuery.Core.Query in '..\..\src\PigQuery.Core.Query.pas',
+  PigQuery.Core.Pair in '..\..\src\PigQuery.Core.Pair.pas';
 
 {$R *.res}
 
