@@ -6,7 +6,7 @@ uses
   PigQuery.Core.Columns, PigQuery.Interfaces, Rtti, JSON;
 
 type
-  TParam = class(TInterfacedObject, IParam)
+  TParam = class(TInterfacedObject, IParam, ISerializable)
   private
     sFieldName: string;
     sParamName: string;

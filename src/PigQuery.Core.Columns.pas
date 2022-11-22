@@ -18,7 +18,7 @@ type
     property Keys: TArray<string> read aKeys write aKeys;
   end;
 
-  TColumn = class(TCustomAttribute, IColumn)
+  TColumn = class(TCustomAttribute, IColumn, ISerializable)
   private
     sName      : string;
     sTableLabel: string;

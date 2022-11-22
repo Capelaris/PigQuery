@@ -7,7 +7,7 @@ uses
   PigQuery.Core.Condition, PigQuery.Core.Table, JSON;
 
 type
-  TJoin = class(TInterfacedObject, IJoin)
+  TJoin = class(TInterfacedObject, IJoin, ISerializable)
   private
     tJoinType  : TJoinType;
     oTable     : ITable;

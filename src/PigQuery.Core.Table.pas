@@ -6,7 +6,7 @@ uses
   PigQuery.Helpers, PigQuery.Interfaces, Rtti, JSON;
 
 type
-  TTable = class(TCustomAttribute, ITable)
+  TTable = class(TCustomAttribute, ITable, ISerializable)
   private
     sName : string;
     sAlias: string;

@@ -1,16 +1,96 @@
 object FrmMainForm: TFrmMainForm
   Left = 0
   Top = 0
-  Caption = 'FrmMainForm'
-  ClientHeight = 299
+  Caption = 'Sample'
+  ClientHeight = 341
   ClientWidth = 635
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Name = 'MS Reference Sans Serif'
   Font.Style = []
   OldCreateOrder = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
+  object mmoQuery: TMemo
+    Left = 0
+    Top = 33
+    Width = 635
+    Height = 308
+    Align = alClient
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Consolas'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    ExplicitLeft = 8
+    ExplicitTop = 24
+    ExplicitWidth = 619
+    ExplicitHeight = 273
+  end
+  object pnlButtons: TPanel
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 33
+    Align = alTop
+    TabOrder = 1
+    object btnSelect: TButton
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
+      Width = 75
+      Height = 25
+      Align = alLeft
+      Caption = 'Select'
+      TabOrder = 0
+      OnClick = btnSelectClick
+      ExplicitLeft = 280
+      ExplicitTop = 0
+    end
+    object btnInsert: TButton
+      AlignWithMargins = True
+      Left = 85
+      Top = 4
+      Width = 75
+      Height = 25
+      Align = alLeft
+      Caption = 'Insert'
+      TabOrder = 1
+      OnClick = btnInsertClick
+      ExplicitLeft = 166
+      ExplicitTop = 2
+      ExplicitHeight = 33
+    end
+    object btnUpdate: TButton
+      AlignWithMargins = True
+      Left = 166
+      Top = 4
+      Width = 75
+      Height = 25
+      Align = alLeft
+      Caption = 'Update'
+      TabOrder = 2
+      OnClick = btnUpdateClick
+      ExplicitLeft = 300
+      ExplicitTop = 2
+      ExplicitHeight = 33
+    end
+    object btnDelete: TButton
+      AlignWithMargins = True
+      Left = 247
+      Top = 4
+      Width = 75
+      Height = 25
+      Align = alLeft
+      Caption = 'Delete'
+      TabOrder = 3
+      OnClick = btnDeleteClick
+      ExplicitLeft = 436
+      ExplicitHeight = 33
+    end
+  end
 end

@@ -202,7 +202,17 @@ type
 
   IInsertQuery = interface(IQuery)
   ['{2C1538C1-A0EB-491A-A7FE-26015467686B}']
+    procedure AddPair(pColumn: IColumn; pValue: TValue);
 
+    function SetPair(pColumn, pValue: string): IInsertQuery; overload;
+    function SetPair(pColumn: string; pValue: TValue): IInsertQuery; overload;
+    function SetPair(pColumn: IColumn; pValue: string): IInsertQuery; overload;
+    function SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery; overload;
+
+    function SetNullPair(pColumn: string): IInsertQuery; overload;
+    function SetNullPair(pColumn: IColumn): IInsertQuery; overload;
+
+    function GetSQL: string;
   end;
 
   IUpdateQuery = interface(IQuery)
@@ -240,6 +250,8 @@ type
 
     function SetNullPair(pColumn: string): IUpdateQuery; overload;
     function SetNullPair(pColumn: IColumn): IUpdateQuery; overload;
+
+    function GetSQL: string;
   end;
 
 implementation

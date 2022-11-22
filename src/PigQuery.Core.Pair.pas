@@ -6,7 +6,7 @@ uses
   PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers, Rtti, JSON;
 
 type
-  TPair = class(TInterfacedObject, IPair)
+  TPair = class(TInterfacedObject, IPair, ISerializable)
   private
     oColumn: IColumn;
     oValue : TValue;

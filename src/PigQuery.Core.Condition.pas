@@ -7,7 +7,7 @@ uses
   SysUtils, JSON;
 
 type
-  TCondition = class(TInterfacedObject, ICondition)
+  TCondition = class(TInterfacedObject, ICondition, ISerializable)
   private
     sCondition    : string;
     sLeftCondition: string;

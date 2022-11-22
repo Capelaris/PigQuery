@@ -165,8 +165,17 @@ type
     sSQL  : string;
     aPairs: TArray<IPair>;
 
+    procedure AddPair(pColumn: IColumn; pValue: TValue);
     function GenerateSQL: string; override;
   public
+    function SetPair(pColumn, pValue: string): IInsertQuery; overload;
+    function SetPair(pColumn: string; pValue: TValue): IInsertQuery; overload;
+    function SetPair(pColumn: IColumn; pValue: string): IInsertQuery; overload;
+    function SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery; overload;
+
+    function SetNullPair(pColumn: string): IInsertQuery; overload;
+    function SetNullPair(pColumn: IColumn): IInsertQuery; overload;
+
     function GetSQL: string;
 
     function Serialize: TJSONObject;
@@ -984,22 +993,89 @@ begin
   with Result do
   begin
     AddPair('Type', Self.tQueryType.ToString);
-    {AddPair('Columns', TArrayUtils<IColumn>.SerializeArray(Self.aColumns));
+    AddPair('Pairs', TArrayUtils<IPair>.SerializeArray(Self.aPairs));
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Joins', TArrayUtils<IJoin>.SerializeArray(Self.aJoins));
-    AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
-    AddPair('OrderBy', TArrayUtils<IColumn>.SerializeArray(Self.aOrderBy));}
   end;
 end;
 
-function TInsertQuery.GenerateSQL: string;
+function TInsertQuery.SetNullPair(pColumn: IColumn): IInsertQuery;
 begin
-  //
+  Self.AddPair(pColumn, 'null');
+end;
+
+function TInsertQuery.SetNullPair(pColumn: string): IInsertQuery;
+begin
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), 'null');
+end;
+
+function TInsertQuery.SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery;
+begin
+  Self.AddPair(pColumn, pValue);
+end;
+
+function TInsertQuery.SetPair(pColumn, pValue: string): IInsertQuery;
+begin
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
+end;
+
+function TInsertQuery.SetPair(pColumn: string; pValue: TValue): IInsertQuery;
+begin
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
+end;
+
+function TInsertQuery.SetPair(pColumn: IColumn; pValue: string): IInsertQuery;
+begin
+  Self.AddPair(pColumn, pValue);
+end;
+
+procedure TInsertQuery.AddPair(pColumn: IColumn; pValue: TValue);
+begin
+  TArrayUtils<IPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
+end;
+
+function TInsertQuery.GenerateSQL: string;
+var
+  i: Integer;
+begin
+  try
+    Self.sSQL := 'insert into ' + Self.oTable.GetName + ' (';
+    for i := 0 to (Length(Self.aPairs) - 1) do
+    begin
+      if i <> 0 then
+        Self.sSQL := Self.sSQL + Spaces(Length('insert into ' + Self.oTable.GetName + ' ('));
+
+      Self.sSQL := Self.sSQL + Self.aPairs[i].GetColumn.GetName + ',' + #13#10;
+    end;
+
+    SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
+
+    Self.sSQL := Self.sSQL + ')' + #13#10 + 'values (';
+
+    for i := 0 to (Length(Self.aPairs) - 1) do
+    begin
+      if i <> 0 then
+        Self.sSQL := Self.sSQL + Spaces(8);
+
+      Self.sSQL := Self.sSQL + Self.aPairs[i].GetValue.ToSQL + ',' + #13#10;
+    end;
+
+    SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
+
+    Self.sSQL := Self.sSQL + ')';
+  except
+    on E: Exception do
+    begin
+      Self.sSQL := '';
+      raise Exception.Create('Erro ao gerar SelectSQL: ' + E.Message);
+    end;
+  end;
+
+  Result := Self.sSQL;
 end;
 
 function TInsertQuery.GetSQL: string;
 begin
-  //
+  Result := Self.GenerateSQL;
 end;
 
 { TUpdateQuery }
@@ -1023,8 +1099,7 @@ end;
 
 function TUpdateQuery.SetNullPair(pColumn: string): IUpdateQuery;
 begin
-  Self.AddPair(TColumn.Create(pColumn, ctUnknown, -1, -1, False, '', '', nil),
-      'null');
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), 'null');
 end;
 
 function TUpdateQuery.SetNullPair(pColumn: IColumn): IUpdateQuery;
@@ -1034,14 +1109,12 @@ end;
 
 function TUpdateQuery.SetPair(pColumn: string; pValue: TValue): IUpdateQuery;
 begin
-  Self.AddPair(TColumn.Create(pColumn, ctUnknown, -1, -1, False, '', '', nil),
-      pValue);
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
 end;
 
 function TUpdateQuery.SetPair(pColumn, pValue: string): IUpdateQuery;
 begin
-  Self.AddPair(TColumn.Create(pColumn, ctUnknown, -1, -1, False, '', '', nil),
-      TValue.From(pValue));
+  Self.AddPair(TVarcharColumn.Create(pColumn, 999), TValue.From(pValue));
 end;
 
 function TUpdateQuery.SetPair(pColumn: IColumn; pValue: string): IUpdateQuery;
@@ -1055,13 +1128,43 @@ begin
 end;
 
 function TUpdateQuery.GenerateSQL: string;
+var
+  i: Integer;
 begin
-  //
+  try
+    Self.sSQL := 'update ' + Self.oTable.GetName + ' ' +
+        Coalesce([Self.oTable.GetAlias, GetTableLabel(1)]) + #13#10 + 'set ';
+    for i := 0 to (Length(Self.aPairs) - 1) do
+    begin
+      if i <> 0 then
+        Self.sSQL := Self.sSQL + Spaces(4);
+
+      Self.sSQL := Self.sSQL + Coalesce([Self.aPairs[i].GetColumn.GetTableLabel, GetTableLabel(1)]) +
+          '.' + Self.aPairs[i].GetColumn.GetName + ' = ' + Self.aPairs[i].GetValue.ToSQL + ',' + #13#10;
+    end;
+
+    SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
+
+    if Length(Self.aWhere) > 0 then
+    begin
+      Self.sSQL := Self.sSQL + #13#10 + 'where ';
+      for i := 0 to (Length(Self.aWhere) - 1) do
+        Self.sSQL := Self.sSQL + Self.aWhere[i].GenerateSQL(6, (i <> 0));
+    end;
+  except
+    on E: Exception do
+    begin
+      Self.sSQL := '';
+      raise Exception.Create('Erro ao gerar SelectSQL: ' + E.Message);
+    end;
+  end;
+
+  Result := Self.sSQL;
 end;
 
 function TUpdateQuery.GetSQL: string;
 begin
-  //
+  Result := Self.GenerateSQL;
 end;
 
 function TUpdateQuery.OrWhere(pLeftField, pCond,
