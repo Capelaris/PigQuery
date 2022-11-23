@@ -20,6 +20,20 @@ type
   TJoinType   = PigQuery.Commons.TJoinType;
   TQueryType  = PigQuery.Commons.TQueryType;
 
+  { Interfaces }
+  ISerializable = PigQuery.Interfaces.ISerializable;
+  IColumn       = PigQuery.Interfaces.IColumn;
+  ITable        = PigQuery.Interfaces.ITable;
+  IParam        = PigQuery.Interfaces.IParam;
+  ICondition    = PigQuery.Interfaces.ICondition;
+  IJoin         = PigQuery.Interfaces.IJoin;
+  IPair         = PigQuery.Interfaces.IPair;
+  IQuery        = PigQuery.Interfaces.IQuery;
+  ISelectQuery  = PigQuery.Interfaces.ISelectQuery;
+  IDeleteQuery  = PigQuery.Interfaces.IDeleteQuery;
+  IInsertQuery  = PigQuery.Interfaces.IInsertQuery;
+  IUpdateQuery  = PigQuery.Interfaces.IUpdateQuery;
+
   { Columns }
   TPrimaryKey            = PigQuery.Core.Columns.TPrimaryKey;
   TColumn                = PigQuery.Core.Columns.TColumn;
