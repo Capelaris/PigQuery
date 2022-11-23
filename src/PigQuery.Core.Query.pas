@@ -5,7 +5,7 @@ interface
 uses
   PigQuery.Helpers, PigQuery.Commons, PigQuery.Interfaces,
   PigQuery.Core.Table, PigQuery.Core.Columns, PigQuery.Core.Condition,
-  PigQuery.Core.Join, PigQuery.Core.Param, PigQuery.Core.Pair,
+  PigQuery.Core.Join, PigQuery.Core.Pair,
   Rtti, Variants, SysUtils, JSON;
 
 type
@@ -69,7 +69,8 @@ type
     constructor Create(pTable: string); overload;
     constructor Create(pTable: ITable); overload;
 
-    function SetColumns(pColumns: TArray<IColumn>): ISelectQuery;
+    function SetColumns(pColumns: TArray<IColumn>): ISelectQuery; overload;
+    function SetColumns(pColumns: TArray<string>): ISelectQuery; overload;
 
     function Join(pJoinType: TJoinType; pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
     function Join(pJoinType: TJoinType; pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
@@ -128,6 +129,9 @@ type
     sSQL: string;
     function GenerateSQL: string; override;
   public
+    constructor Create(pTable: string); overload;
+    constructor Create(pTable: ITable); overload;
+
     function Where(pCond: string): IDeleteQuery; overload;
     function Where(pLeftField, pRightField: string): IDeleteQuery; overload;
     function Where(pLeftField, pCond, pRightField: string): IDeleteQuery; overload;
@@ -168,6 +172,9 @@ type
     procedure AddPair(pColumn: IColumn; pValue: TValue);
     function GenerateSQL: string; override;
   public
+    constructor Create(pTable: string); overload;
+    constructor Create(pTable: ITable); overload;
+
     function SetPair(pColumn, pValue: string): IInsertQuery; overload;
     function SetPair(pColumn: string; pValue: TValue): IInsertQuery; overload;
     function SetPair(pColumn: IColumn; pValue: string): IInsertQuery; overload;
@@ -192,6 +199,9 @@ type
     procedure AddPair(pColumn: IColumn; pValue: TValue);
     function GenerateSQL: string; override;
   public
+    constructor Create(pTable: string); overload;
+    constructor Create(pTable: ITable); overload;
+
     function Where(pCond: string): IUpdateQuery; overload;
     function Where(pLeftField, pRightField: string): IUpdateQuery; overload;
     function Where(pLeftField, pCond, pRightField: string): IUpdateQuery; overload;
@@ -434,6 +444,17 @@ begin
     AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
     AddPair('OrderBy', TArrayUtils<IColumn>.SerializeArray(Self.aOrderBy));
   end;
+end;
+
+function TSelectQuery.SetColumns(pColumns: TArray<string>): ISelectQuery;
+var
+  Columns: TArray<IColumn>;
+  Column : string;
+begin
+  for Column in pColumns do
+    TArrayUtils<IColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
+  Self.SetColumns(Columns);
+  Result := Self;
 end;
 
 constructor TSelectQuery.Create(pTable: string);
@@ -797,6 +818,18 @@ end;
 
 { TDeleteQuery }
 
+constructor TDeleteQuery.Create(pTable: string);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtDelete;
+end;
+
+constructor TDeleteQuery.Create(pTable: ITable);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtDelete;
+end;
+
 function TDeleteQuery.Serialize: TJSONObject;
 begin
   Result := TJSONObject.Create;
@@ -1001,36 +1034,54 @@ end;
 function TInsertQuery.SetNullPair(pColumn: IColumn): IInsertQuery;
 begin
   Self.AddPair(pColumn, 'null');
+  Result := Self;
 end;
 
 function TInsertQuery.SetNullPair(pColumn: string): IInsertQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), 'null');
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), 'null');
+  Result := Self;
 end;
 
 function TInsertQuery.SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery;
 begin
   Self.AddPair(pColumn, pValue);
+  Result := Self;
 end;
 
 function TInsertQuery.SetPair(pColumn, pValue: string): IInsertQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
+  Result := Self;
 end;
 
 function TInsertQuery.SetPair(pColumn: string; pValue: TValue): IInsertQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
+  Result := Self;
 end;
 
 function TInsertQuery.SetPair(pColumn: IColumn; pValue: string): IInsertQuery;
 begin
   Self.AddPair(pColumn, pValue);
+  Result := Self;
 end;
 
 procedure TInsertQuery.AddPair(pColumn: IColumn; pValue: TValue);
 begin
   TArrayUtils<IPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
+end;
+
+constructor TInsertQuery.Create(pTable: string);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtInsert;
+end;
+
+constructor TInsertQuery.Create(pTable: ITable);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtInsert;
 end;
 
 function TInsertQuery.GenerateSQL: string;
@@ -1099,32 +1150,50 @@ end;
 
 function TUpdateQuery.SetNullPair(pColumn: string): IUpdateQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), 'null');
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), 'null');
+  Result := Self;
 end;
 
 function TUpdateQuery.SetNullPair(pColumn: IColumn): IUpdateQuery;
 begin
   Self.AddPair(pColumn, 'null');
+  Result := Self;
 end;
 
 function TUpdateQuery.SetPair(pColumn: string; pValue: TValue): IUpdateQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), pValue);
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
+  Result := Self;
 end;
 
 function TUpdateQuery.SetPair(pColumn, pValue: string): IUpdateQuery;
 begin
-  Self.AddPair(TVarcharColumn.Create(pColumn, 999), TValue.From(pValue));
+  Self.AddPair(TVarcharColumn.Create(pColumn, -1), TValue.From(pValue));
+  Result := Self;
 end;
 
 function TUpdateQuery.SetPair(pColumn: IColumn; pValue: string): IUpdateQuery;
 begin
   Self.AddPair(pColumn, TValue.From(pValue));
+  Result := Self;
 end;
 
 function TUpdateQuery.SetPair(pColumn: IColumn; pValue: TValue): IUpdateQuery;
 begin
   Self.AddPair(pColumn, pValue);
+  Result := Self;
+end;
+
+constructor TUpdateQuery.Create(pTable: string);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtUpdate;
+end;
+
+constructor TUpdateQuery.Create(pTable: ITable);
+begin
+  inherited Create(pTable);
+  Self.tQueryType := qtUpdate;
 end;
 
 function TUpdateQuery.GenerateSQL: string;

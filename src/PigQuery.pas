@@ -11,7 +11,6 @@ uses
   PigQuery.Core.Table,
   PigQuery.Core.Pair,
   PigQuery.Core.Join,
-  PigQuery.Core.Param,
   PigQuery.Core.Condition,
   PigQuery.Core.Query;
 
@@ -47,9 +46,6 @@ type
 
   { Join }
   TJoin = PigQuery.Core.Join.TJoin;
-
-  { Param }
-  TParam = PigQuery.Core.Param.TParam;
 
   { Condition }
   TCondition = PigQuery.Core.Condition.TCondition;

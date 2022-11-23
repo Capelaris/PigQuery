@@ -37,9 +37,9 @@
 - **[ X ]** Base Table
 - **[ X ]** Table Alias
 
-### **Params**
+### **Pairs**
 
-- **[ X ]** Base Param
+- **[ X ]** Base Pair
 
 ### **Joins**
 
@@ -86,8 +86,8 @@ uses PigQuery;
 
 ```delphi
 TSelectQuery.Create('Table1')
-    .Where('column1', 'test')
-    .GetSQL(['column1', 'column2']);
+  .Where('column1', QuotedStr('test'))
+  .GetSQL(['column1', 'column2']);
 ```
 
 Result
@@ -96,7 +96,7 @@ Result
 select a.column1,
        a.column2
 from Table1 a
-where a.column1 = 'test'
+where column1 = 'test'
 ```
 
 > For more details and other examples, [visit the Wiki](https://github.com/Capelaris/PigQuery/wiki/Select-Query)
@@ -105,18 +105,18 @@ where a.column1 = 'test'
 
 ```delphi
 TInsertQuery.Create('Table1')
-    .SetPair('column1', 'value 1')
-    .SetPair('column2', 'value 2')
-    .GetSQL;
+  .SetPair('column1', 'value 1')
+  .SetPair('column2', 'value 2')
+  .GetSQL;
 ```
 
 Result
 
 ```sql
 insert into Table1 (column1,
-                   column2)
-values('value 1',
-       'value 2')
+                    column2)
+values ('value 1',
+        'value 2')
 ```
 
 > For more details and other examples, [visit the Wiki](https://github.com/Capelaris/PigQuery/wiki/Insert-Query)
@@ -125,19 +125,19 @@ values('value 1',
 
 ```delphi
 TUpdateQuery.Create('Table1')
-    .SetPair('column1', 'value 1')
-    .SetPair('column2', 'value 2')
-    .Where('column1', 'test')
-    .GetSQL;
+  .SetPair('column1', 'value 1')
+  .SetPair('column2', 'value 2')
+  .Where('column1', QuotedStr('test'))
+  .GetSQL;
 ```
 
 Result
 
 ```sql
 update Table1 a
-set a.column1 = 'value 1'
+set a.column1 = 'value 1',
     a.column2 = 'value 2'
-where a.column1 = 'test'
+where column1 = 'test'
 ```
 
 > For more details and other examples, [visit the Wiki](https://github.com/Capelaris/PigQuery/wiki/Update-Query)
@@ -146,15 +146,15 @@ where a.column1 = 'test'
 
 ```delphi
 TDeleteQuery.Create('Table1')
-    .Where('column1', 'test')
-    .GetSQL;
+  .Where('column1', QuotedStr('test'))
+  .GetSQL;
 ```
 
 Result
 
 ```sql
 delete from Table1 a
-where a.column1 = 'test'
+where column1 = 'test'
 ```
 
 > For more details and other examples, [visit the Wiki](https://github.com/Capelaris/PigQuery/wiki/Delete-Query)

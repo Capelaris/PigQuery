@@ -110,7 +110,6 @@
         <DCCReference Include="..\..\src\PigQuery.Core.Table.pas"/>
         <DCCReference Include="..\..\src\PigQuery.Helpers.pas"/>
         <DCCReference Include="..\..\src\PigQuery.Interfaces.pas"/>
-        <DCCReference Include="..\..\src\PigQuery.Core.Param.pas"/>
         <DCCReference Include="..\..\src\PigQuery.Core.Join.pas"/>
         <DCCReference Include="..\..\src\PigQuery.Core.Condition.pas"/>
         <DCCReference Include="..\..\src\PigQuery.Core.Query.pas"/>

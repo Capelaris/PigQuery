@@ -122,7 +122,8 @@ type
   ['{84AC3367-65E7-430F-9D63-42A97EBC4389}']
     procedure AddJoin(pJoin: IJoin);
 
-    function SetColumns(pColumns: TArray<IColumn>): ISelectQuery;
+    function SetColumns(pColumns: TArray<IColumn>): ISelectQuery; overload;
+    function SetColumns(pColumns: TArray<string>): ISelectQuery; overload;
 
     function Join(pJoinType: TJoinType; pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
     function Join(pJoinType: TJoinType; pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;

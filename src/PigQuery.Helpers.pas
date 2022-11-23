@@ -4,7 +4,7 @@ interface
 
 uses
   PigQuery.Commons, PigQuery.Interfaces, System.StrUtils,
-  System.Generics.Defaults, System.Math, Rtti, JSON;
+  System.Generics.Defaults, System.Math, Rtti, JSON, Dialogs, SysUtils;
 
 type
   TArrayUtils<T> = class
@@ -94,9 +94,15 @@ end;
 
 function GetTValueJSONValue(Value: TValue): TJSONValue;
 begin
-  Result := TJSONValue.Create;
-  //if Value.TypeInfo.TypeData. then
-
+  Result := TJSONNull.Create;
+  if Value.Kind in [tkInteger, tkInt64] then
+    Result := TJSONNumber.Create(Value.AsInt64)
+  else if Value.Kind in [tkEnumeration, tkFloat] then
+    Result := TJSONNumber.Create(Value.AsExtended)
+  else if Value.Kind in [tkChar, tkString, tkWChar, tkLString,
+      tkWString, tkUString, tkAnsiChar, tkWideChar, tkUnicodeString,
+      tkAnsiString, tkWideString, tkShortString, tkVariant] then
+    Result := TJSONString.Create(Value.AsString);
 end;
 
 { TArrayUtils<T> }
@@ -287,7 +293,15 @@ end;
 
 function TValueHelper.ToSQL: string;
 begin
-  Result := '';
+  Result := 'null';
+  if Self.Kind in [tkInteger, tkInt64] then
+    Result := IntToStr(Self.AsInt64)
+  else if Self.Kind in [tkEnumeration, tkFloat] then
+    Result := FloatToStr(Self.AsExtended)
+  else if Self.Kind in [tkChar, tkString, tkWChar, tkLString,
+      tkWString, tkUString, tkAnsiChar, tkWideChar, tkUnicodeString,
+      tkAnsiString, tkWideString, tkShortString, tkVariant] then
+    Result := QuotedStr(Self.AsString);
 end;
 
 end.
