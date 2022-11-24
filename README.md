@@ -22,7 +22,7 @@
 - **[ X ]** BigInt
 - **[ X ]** Decimal
 - **[ X ]** Numeric
-- **[ X ]** ctFloat
+- **[ X ]** Float
 - **[ X ]** Double Precision
 - **[ X ]** Date
 - **[ X ]** Time
