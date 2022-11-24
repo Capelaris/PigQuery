@@ -13,13 +13,16 @@ uses
   PigQuery.Core.Join in '..\..\src\PigQuery.Core.Join.pas',
   PigQuery.Core.Condition in '..\..\src\PigQuery.Core.Condition.pas',
   PigQuery.Core.Query in '..\..\src\PigQuery.Core.Query.pas',
-  PigQuery.Core.Pair in '..\..\src\PigQuery.Core.Pair.pas';
+  PigQuery.Core.Pair in '..\..\src\PigQuery.Core.Pair.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Tablet Light');
   Application.CreateForm(TFrmMainForm, FrmMainForm);
   Application.Run;
 end.

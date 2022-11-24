@@ -24,7 +24,6 @@ type
   ISerializable = PigQuery.Interfaces.ISerializable;
   IColumn       = PigQuery.Interfaces.IColumn;
   ITable        = PigQuery.Interfaces.ITable;
-  IParam        = PigQuery.Interfaces.IParam;
   ICondition    = PigQuery.Interfaces.ICondition;
   IJoin         = PigQuery.Interfaces.IJoin;
   IPair         = PigQuery.Interfaces.IPair;

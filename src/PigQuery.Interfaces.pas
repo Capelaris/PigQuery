@@ -43,16 +43,6 @@ type
     function GetAlias: string;
   end;
 
-  IParam = interface(ISerializable)
-  ['{153A2D32-6758-4037-B29F-F94EB1CF717A}']
-    procedure SetFieldName(Value: string);
-    function GetFieldName: string;
-    procedure SetParamName(Value: string);
-    function GetParamName: string;
-    procedure SetValue(Value: TValue);
-    function GetValue: TValue;
-  end;
-
   ICondition = interface(ISerializable)
   ['{557D4B00-E141-4C07-B951-104E3B755C0B}']
     procedure SetCondition(Value: string);

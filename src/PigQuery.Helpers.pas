@@ -15,7 +15,6 @@ type
     class function SerializeArray(Arr: TArray<ISerializable>): TJSONArray; overload;
     class function SerializeArray(Arr: TArray<IColumn>): TJSONArray; overload;
     class function SerializeArray(Arr: TArray<ITable>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IParam>): TJSONArray; overload;
     class function SerializeArray(Arr: TArray<ICondition>): TJSONArray; overload;
     class function SerializeArray(Arr: TArray<IJoin>): TJSONArray; overload;
     class function SerializeArray(Arr: TArray<IPair>): TJSONArray; overload;
@@ -167,17 +166,6 @@ class function TArrayUtils<T>.SerializeArray(
   Arr: TArray<ICondition>): TJSONArray;
 var
   Obj: ICondition;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<IParam>): TJSONArray;
-var
-  Obj: IParam;
 begin
   Result := TJSONArray.Create;
   for Obj in Arr do
