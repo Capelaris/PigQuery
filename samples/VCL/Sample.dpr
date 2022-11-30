@@ -9,7 +9,6 @@ uses
   PigQuery.Core.Columns in '..\..\src\PigQuery.Core.Columns.pas',
   PigQuery.Core.Table in '..\..\src\PigQuery.Core.Table.pas',
   PigQuery.Helpers in '..\..\src\PigQuery.Helpers.pas',
-  PigQuery.Interfaces in '..\..\src\PigQuery.Interfaces.pas',
   PigQuery.Core.Join in '..\..\src\PigQuery.Core.Join.pas',
   PigQuery.Core.Condition in '..\..\src\PigQuery.Core.Condition.pas',
   PigQuery.Core.Query in '..\..\src\PigQuery.Core.Query.pas',

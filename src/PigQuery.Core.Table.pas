@@ -3,10 +3,10 @@ unit PigQuery.Core.Table;
 interface
 
 uses
-  PigQuery.Helpers, PigQuery.Interfaces, Rtti, JSON;
+  PigQuery.Helpers, Rtti, JSON;
 
 type
-  TTable = class(TCustomAttribute, ITable, ISerializable)
+  TTable = class(TCustomAttribute)
   private
     sName : string;
     sAlias: string;
@@ -15,11 +15,6 @@ type
     function GetName: string;
     procedure SetAlias(Value: string);
     function GetAlias: string;
-  protected
-    [Volatile] FRefCount: Integer;
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
-    function _AddRef: Integer; stdcall;
-    function _Release: Integer; stdcall;
   public
     constructor Create(pName, pAlias: string); overload;
     constructor Create(pName: string); overload;
@@ -62,14 +57,6 @@ begin
   Result := Self.sName;
 end;
 
-function TTable.QueryInterface(const IID: TGUID; out Obj): HResult;
-begin
-  if GetInterface(IID, Obj) then
-    Result := 0
-  else
-    Result := E_NOINTERFACE;
-end;
-
 function TTable.Serialize: TJSONObject;
 begin
   Result := TJSONObject.Create;
@@ -88,29 +75,6 @@ end;
 procedure TTable.SetName(Value: string);
 begin
   Self.sName := Value;
-end;
-
-function TTable._AddRef: Integer;
-begin
-{$IFNDEF AUTOREFCOUNT}
-  Result := AtomicIncrement(FRefCount);
-{$ELSE}
-  Result := __ObjAddRef;
-{$ENDIF}
-end;
-
-function TTable._Release: Integer;
-begin
-{$IFNDEF AUTOREFCOUNT}
-  Result := AtomicDecrement(FRefCount);
-  if Result = 0 then
-  begin
-    // Mark the refcount field so that any refcounting during destruction doesn't infinitely recurse.
-    Destroy;
-  end;
-{$ELSE}
-  Result := __ObjRelease;
-{$ENDIF}
 end;
 
 constructor TTable.Create(pName, pAlias: string);

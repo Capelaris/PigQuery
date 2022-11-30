@@ -3,8 +3,7 @@ unit PigQuery.Core.Columns;
 interface
 
 uses
-  PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers, Rtti, Variants, DB,
-  SysUtils, JSON;
+  PigQuery.Commons, PigQuery.Helpers, Rtti, Variants, DB, SysUtils, JSON;
 
 type
   TPrimaryKey = class(TCustomAttribute)
@@ -18,7 +17,7 @@ type
     property Keys: TArray<string> read aKeys write aKeys;
   end;
 
-  TColumn = class(TCustomAttribute, IColumn, ISerializable)
+  TColumn = class(TCustomAttribute)
   private
     sName      : string;
     sTableLabel: string;
@@ -48,18 +47,13 @@ type
     function GetCollate: string;
     procedure SetDefaultVal(Value: TValue);
     function GetDefaultVal: TValue;
-  protected
-    [Volatile] FRefCount: Integer;
-    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
-    function _AddRef: Integer; stdcall;
-    function _Release: Integer; stdcall;
   public
     constructor Create(pName: string; pType: TColumnType; pSize, pScale: Integer;
       pNotNull: Boolean; pCharset, pCollate: string; pDefaultVal: TValue;
       pTableLabel: string = '');
 
     function GetValue(pField: TField): TValue; virtual;
-    class function Copy(pObject: IColumn): IColumn;
+    class function Copy(pObject: TColumn): TColumn;
     function Serialize: TJSONObject;
 
     property Name      : string      read sName       write sName;
@@ -277,7 +271,7 @@ implementation
 
 { TColumn }
 
-class function TColumn.Copy(pObject: IColumn): IColumn;
+class function TColumn.Copy(pObject: TColumn): TColumn;
 begin
   Result := TColumn.Create(
         pObject.GetName,
@@ -367,14 +361,6 @@ begin
   end;
 end;
 
-function TColumn.QueryInterface(const IID: TGUID; out Obj): HResult;
-begin
-  if GetInterface(IID, Obj) then
-    Result := 0
-  else
-    Result := E_NOINTERFACE;
-end;
-
 function TColumn.Serialize: TJSONObject;
 begin
   Result := TJSONObject.Create;
@@ -435,29 +421,6 @@ end;
 procedure TColumn.SetTableLabel(Value: string);
 begin
   Self.sTableLabel := Value;
-end;
-
-function TColumn._AddRef: Integer;
-begin
-{$IFNDEF AUTOREFCOUNT}
-  Result := AtomicIncrement(FRefCount);
-{$ELSE}
-  Result := __ObjAddRef;
-{$ENDIF}
-end;
-
-function TColumn._Release: Integer;
-begin
-{$IFNDEF AUTOREFCOUNT}
-  Result := AtomicDecrement(FRefCount);
-  if Result = 0 then
-  begin
-    // Mark the refcount field so that any refcounting during destruction doesn't infinitely recurse.
-    Destroy;
-  end;
-{$ELSE}
-  Result := __ObjRelease;
-{$ENDIF}
 end;
 
 { TSmallIntColumn }

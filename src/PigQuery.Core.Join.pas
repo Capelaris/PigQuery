@@ -3,46 +3,46 @@ unit PigQuery.Core.Join;
 interface
 
 uses
-  PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers,
-  PigQuery.Core.Condition, PigQuery.Core.Table, JSON;
+  PigQuery.Commons, PigQuery.Helpers, PigQuery.Core.Condition,
+  PigQuery.Core.Table, JSON;
 
 type
-  TJoin = class(TInterfacedObject, IJoin, ISerializable)
+  TJoin = class
   private
     tJoinType  : TJoinType;
-    oTable     : ITable;
-    aConditions: TArray<ICondition>;
+    oTable     : TTable;
+    aConditions: TArray<TCondition>;
 
     function GetType: string;
 
     procedure SetJoinType(Value: TJoinType);
     function GetJoinType: TJoinType;
-    procedure SetTable(Value: ITable);
-    function GetTable: ITable;
-    procedure SetConditions(Value: TArray<ICondition>);
-    function GetConditions: TArray<ICondition>;
+    procedure SetTable(Value: TTable);
+    function GetTable: TTable;
+    procedure SetConditions(Value: TArray<TCondition>);
+    function GetConditions: TArray<TCondition>;
   public
-    constructor Create(pJoinType: TJoinType; pTable: ITable;
-      pConditions: TArray<ICondition>); overload;
+    constructor Create(pJoinType: TJoinType; pTable: TTable;
+      pConditions: TArray<TCondition>); overload;
     constructor Create(pJoinType: TJoinType; pTable: string;
-      pConditions: TArray<ICondition>); overload;
-    constructor Create(pTable: ITable; pConditions: TArray<ICondition>); overload;
-    constructor Create(pTable: string; pConditions: TArray<ICondition>); overload;
+      pConditions: TArray<TCondition>); overload;
+    constructor Create(pTable: TTable; pConditions: TArray<TCondition>); overload;
+    constructor Create(pTable: string; pConditions: TArray<TCondition>); overload;
 
     function GenerateSQL(pSpaces: Integer = 0; pTableLabel: string = ''): string;
     function Serialize: TJSONObject;
 
     property JoinType  : TJoinType          read GetJoinType   write SetJoinType;
-    property Table     : ITable             read GetTable      write SetTable;
-    property Conditions: TArray<ICondition> read GetConditions write SetConditions;
+    property Table     : TTable             read GetTable      write SetTable;
+    property Conditions: TArray<TCondition> read GetConditions write SetConditions;
   end;
 
 implementation
 
 { TJoin }
 
-constructor TJoin.Create(pJoinType: TJoinType; pTable: ITable;
-  pConditions: TArray<ICondition>);
+constructor TJoin.Create(pJoinType: TJoinType; pTable: TTable;
+  pConditions: TArray<TCondition>);
 begin
   inherited Create;
   tJoinType   := pJoinType;
@@ -51,19 +51,19 @@ begin
 end;
 
 constructor TJoin.Create(pJoinType: TJoinType; pTable: string;
-  pConditions: TArray<ICondition>);
+  pConditions: TArray<TCondition>);
 begin
   Create(pJoinType, TTable.Create(pTable), pConditions);
 end;
 
-constructor TJoin.Create(pTable: ITable;
-  pConditions: TArray<ICondition>);
+constructor TJoin.Create(pTable: TTable;
+  pConditions: TArray<TCondition>);
 begin
   Create(jtNone, pTable, pConditions);
 end;
 
 constructor TJoin.Create(pTable: string;
-  pConditions: TArray<ICondition>);
+  pConditions: TArray<TCondition>);
 begin
   Create(jtNone, TTable.Create(pTable), pConditions);
 end;
@@ -72,14 +72,14 @@ function TJoin.GenerateSQL(pSpaces: Integer; pTableLabel: string): string;
 var
   i: Integer;
 begin
-  Result := Spaces(pSpaces) + GetType + oTable.GetName + ' ' +
-      Coalesce([pTableLabel, oTable.GetAlias]) + ' on';
+  Result := Spaces(pSpaces) + GetType + oTable.Name + ' ' +
+      Coalesce([pTableLabel, oTable.Alias]) + ' on';
 
   for i := 0 to (Length(aConditions) - 1) do
     Result := Result + #13#10 + aConditions[i].GenerateSQL(pSpaces, (i <> 0));
 end;
 
-function TJoin.GetConditions: TArray<ICondition>;
+function TJoin.GetConditions: TArray<TCondition>;
 begin
   Result := Self.aConditions;
 end;
@@ -89,7 +89,7 @@ begin
   Result := Self.tJoinType;
 end;
 
-function TJoin.GetTable: ITable;
+function TJoin.GetTable: TTable;
 begin
   Result := Self.oTable;
 end;
@@ -114,11 +114,11 @@ begin
   begin
     AddPair('Type', Self.tJoinType.ToString);
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Conditions', TArrayUtils<ICondition>.SerializeArray(Self.aConditions));
+    AddPair('Conditions', TArrayUtils<TCondition>.SerializeArray(Self.aConditions));
   end;
 end;
 
-procedure TJoin.SetConditions(Value: TArray<ICondition>);
+procedure TJoin.SetConditions(Value: TArray<TCondition>);
 begin
   Self.aConditions := Value;
 end;
@@ -128,7 +128,7 @@ begin
   Self.tJoinType := Value;
 end;
 
-procedure TJoin.SetTable(Value: ITable);
+procedure TJoin.SetTable(Value: TTable);
 begin
   Self.oTable := Value;
 end;

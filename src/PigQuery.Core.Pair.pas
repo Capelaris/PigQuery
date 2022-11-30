@@ -3,28 +3,28 @@ unit PigQuery.Core.Pair;
 interface
 
 uses
-  PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers, Rtti, JSON;
+  PigQuery.Commons, PigQuery.Core.Columns, PigQuery.Helpers, Rtti, JSON;
 
 type
-  TPair = class(TInterfacedObject, IPair, ISerializable)
+  TPair = class
   private
-    oColumn: IColumn;
+    oColumn: TColumn;
     oValue : TValue;
 
-    procedure SetColumn(Value: IColumn);
-    function GetColumn: IColumn;
+    procedure SetColumn(Value: TColumn);
+    function GetColumn: TColumn;
     procedure SetValue(Value: TValue);
     function GetValue: TValue;
   public
-    constructor Create(pColumn: IColumn; pValue: TValue); overload;
-    constructor Create(pColumn: IColumn; pValue: string); overload;
-    constructor Create(pColumn: IColumn; pValue: Extended); overload;
-    constructor Create(pColumn: IColumn; pValue: Integer); overload;
-    constructor Create(pColumn: IColumn; pValue: TDateTime); overload;
+    constructor Create(pColumn: TColumn; pValue: TValue); overload;
+    constructor Create(pColumn: TColumn; pValue: string); overload;
+    constructor Create(pColumn: TColumn; pValue: Extended); overload;
+    constructor Create(pColumn: TColumn; pValue: Integer); overload;
+    constructor Create(pColumn: TColumn; pValue: TDateTime); overload;
 
     function Serialize: TJSONObject;
 
-    property Column: IColumn read GetColumn write SetColumn;
+    property Column: TColumn read GetColumn write SetColumn;
     property Value : TValue  read GetValue  write SetValue;
   end;
 
@@ -32,7 +32,7 @@ implementation
 
 { TPair }
 
-constructor TPair.Create(pColumn: IColumn; pValue: TValue);
+constructor TPair.Create(pColumn: TColumn; pValue: TValue);
 begin
   inherited Create;
   Self.oColumn  := pColumn;
@@ -42,35 +42,35 @@ begin
     Self.oValue := pValue;
 end;
 
-constructor TPair.Create(pColumn: IColumn; pValue: string);
+constructor TPair.Create(pColumn: TColumn; pValue: string);
 begin
   inherited Create;
   Self.oColumn := pColumn;
   Self.oValue  := TValue.From(pValue);
 end;
 
-constructor TPair.Create(pColumn: IColumn; pValue: Extended);
+constructor TPair.Create(pColumn: TColumn; pValue: Extended);
 begin
   inherited Create;
   Self.oColumn := pColumn;
   Self.oValue  := TValue.From(pValue);
 end;
 
-constructor TPair.Create(pColumn: IColumn; pValue: Integer);
+constructor TPair.Create(pColumn: TColumn; pValue: Integer);
 begin
   inherited Create;
   Self.oColumn := pColumn;
   Self.oValue  := TValue.From(pValue);
 end;
 
-constructor TPair.Create(pColumn: IColumn; pValue: TDateTime);
+constructor TPair.Create(pColumn: TColumn; pValue: TDateTime);
 begin
   inherited Create;
   Self.oColumn := pColumn;
   Self.oValue  := TValue.From(pValue);
 end;
 
-function TPair.GetColumn: IColumn;
+function TPair.GetColumn: TColumn;
 begin
   Result := Self.oColumn;
 end;
@@ -90,7 +90,7 @@ begin
   end;
 end;
 
-procedure TPair.SetColumn(Value: IColumn);
+procedure TPair.SetColumn(Value: TColumn);
 begin
   Self.oColumn := Value;
 end;

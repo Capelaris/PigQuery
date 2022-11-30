@@ -3,26 +3,16 @@ unit PigQuery.Helpers;
 interface
 
 uses
-  PigQuery.Commons, PigQuery.Interfaces, System.StrUtils,
-  System.Generics.Defaults, System.Math, Rtti, JSON, Dialogs, SysUtils;
+  PigQuery.Commons, System.StrUtils, System.Generics.Defaults, System.Math, Rtti,
+  JSON, Dialogs, SysUtils;
 
 type
-  TArrayUtils<T> = class
+  TArrayUtils<T: class> = class
     class procedure Append(var Arr: TArray<T>; Value: T); overload;
     class procedure Append(var Arr: TArray<T>; Values: TArray<T>); overload;
     class function Contains(const anArray: array of T; const x: T) : Boolean;
     class function Count(const anArray: array of T; const x: T) : Integer;
-    class function SerializeArray(Arr: TArray<ISerializable>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IColumn>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<ITable>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<ICondition>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IJoin>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IPair>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IQuery>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<ISelectQuery>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IDeleteQuery>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IInsertQuery>): TJSONArray; overload;
-    class function SerializeArray(Arr: TArray<IUpdateQuery>): TJSONArray; overload;
+    class function SerializeArray(Arr: TArray<T>): TJSONArray; overload;
   end;
 
   TValueHelper = record helper for TValue
@@ -151,129 +141,28 @@ begin
   end;
 end;
 
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<IJoin>): TJSONArray;
+class function TArrayUtils<T>.SerializeArray(Arr: TArray<T>): TJSONArray;
 var
-  Obj: IJoin;
+  Obj: T;
+  Ctx: TRttiContext;
+  Tp : TRttiType;
+  Mtd: TRttiMethod;
 begin
   Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
+  Ctx := TRttiContext.Create;
+  try
+    Tp  := Ctx.GetType(T);
+    Mtd := Tp.GetMethod('Serialize');
 
-class function TArrayUtils<T>.SerializeArray(
-  Arr: TArray<ICondition>): TJSONArray;
-var
-  Obj: ICondition;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<ITable>): TJSONArray;
-var
-  Obj: ITable;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<IColumn>): TJSONArray;
-var
-  Obj: IColumn;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<IPair>): TJSONArray;
-var
-  Obj: IPair;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(
-  Arr: TArray<IUpdateQuery>): TJSONArray;
-var
-  Obj: IUpdateQuery;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(
-  Arr: TArray<IInsertQuery>): TJSONArray;
-var
-  Obj: IInsertQuery;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(
-  Arr: TArray<IDeleteQuery>): TJSONArray;
-var
-  Obj: IDeleteQuery;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(
-  Arr: TArray<ISelectQuery>): TJSONArray;
-var
-  Obj: ISelectQuery;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<IQuery>): TJSONArray;
-var
-  Obj: IQuery;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
-  end;
-end;
-
-class function TArrayUtils<T>.SerializeArray(Arr: TArray<ISerializable>): TJSONArray;
-var
-  Obj: ISerializable;
-begin
-  Result := TJSONArray.Create;
-  for Obj in Arr do
-  begin
-    Result.AddElement(Obj.Serialize);
+    if Mtd <> nil then
+    begin
+      for Obj in Arr do
+      begin
+        Result.AddElement(TJSONValue(Mtd.Invoke(Obj, []).AsObject));
+      end;
+    end;
+  finally
+    Ctx.Free;
   end;
 end;
 

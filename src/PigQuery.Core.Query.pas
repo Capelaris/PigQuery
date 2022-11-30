@@ -3,119 +3,118 @@ unit PigQuery.Core.Query;
 interface
 
 uses
-  PigQuery.Helpers, PigQuery.Commons, PigQuery.Interfaces,
-  PigQuery.Core.Table, PigQuery.Core.Columns, PigQuery.Core.Condition,
-  PigQuery.Core.Join, PigQuery.Core.Pair,
+  PigQuery.Helpers, PigQuery.Commons, PigQuery.Core.Table, PigQuery.Core.Columns,
+  PigQuery.Core.Condition, PigQuery.Core.Join, PigQuery.Core.Pair,
   Rtti, Variants, SysUtils, JSON;
 
 type
-  TQuery = class(TInterfacedObject, IQuery)
+  TQuery = class
   private
     tQueryType: TQueryType;
-    oTable    : ITable;
-    aWhere    : TArray<ICondition>;
+    oTable    : TTable;
+    aWhere    : TArray<TCondition>;
 
     procedure SetQueryType(Value: TQueryType);
     function GetQueryType: TQueryType;
-    procedure SetTable(Value: ITable);
-    function GetTable: ITable;
+    procedure SetTable(Value: TTable);
+    function GetTable: TTable;
 
-    procedure AddWhere(pCondition: ICondition);
+    procedure AddWhere(pCondition: TCondition);
     function GenerateSQL: string; virtual; abstract;
 
-    function Where(pCond: string): IQuery; overload;
-    function Where(pLeftField, pRightField: string): IQuery; overload;
-    function Where(pLeftField, pCond, pRightField: string): IQuery; overload;
-    function Where(pLeftField, pCond: string; pValues: TArray<string>): IQuery; overload;
-    function Where(pLeftField, pRightField: IColumn): IQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pRightField: IColumn): IQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IQuery; overload;
-    function WhereIn(pLeftField: string; pValues: TArray<string>): IQuery; overload;
-    function WhereIn(pLeftField: IColumn; pValues: TArray<string>): IQuery; overload;
-    function WhereNotIn(pLeftField: string; pValues: TArray<string>): IQuery; overload;
-    function WhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IQuery; overload;
+    function Where(pCond: string): TQuery; overload;
+    function Where(pLeftField, pRightField: string): TQuery; overload;
+    function Where(pLeftField, pCond, pRightField: string): TQuery; overload;
+    function Where(pLeftField, pCond: string; pValues: TArray<string>): TQuery; overload;
+    function Where(pLeftField, pRightField: TColumn): TQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pRightField: TColumn): TQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TQuery; overload;
+    function WhereIn(pLeftField: string; pValues: TArray<string>): TQuery; overload;
+    function WhereIn(pLeftField: TColumn; pValues: TArray<string>): TQuery; overload;
+    function WhereNotIn(pLeftField: string; pValues: TArray<string>): TQuery; overload;
+    function WhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TQuery; overload;
 
-    function OrWhere(pCond: string): IQuery; overload;
-    function OrWhere(pLeftField, pRightField: string): IQuery; overload;
-    function OrWhere(pLeftField, pCond, pRightField: string): IQuery; overload;
-    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): IQuery; overload;
-    function OrWhere(pLeftField, pRightField: IColumn): IQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pRightField: IColumn): IQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IQuery; overload;
-    function OrWhereIn(pLeftField: string; pValues: TArray<string>): IQuery; overload;
-    function OrWhereIn(pLeftField: IColumn; pValues: TArray<string>): IQuery; overload;
-    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): IQuery; overload;
-    function OrWhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IQuery; overload;
+    function OrWhere(pCond: string): TQuery; overload;
+    function OrWhere(pLeftField, pRightField: string): TQuery; overload;
+    function OrWhere(pLeftField, pCond, pRightField: string): TQuery; overload;
+    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): TQuery; overload;
+    function OrWhere(pLeftField, pRightField: TColumn): TQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pRightField: TColumn): TQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TQuery; overload;
+    function OrWhereIn(pLeftField: string; pValues: TArray<string>): TQuery; overload;
+    function OrWhereIn(pLeftField: TColumn; pValues: TArray<string>): TQuery; overload;
+    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): TQuery; overload;
+    function OrWhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TQuery; overload;
   public
     constructor Create(pTable: string); overload;
-    constructor Create(pTable: ITable); overload;
+    constructor Create(pTable: TTable); overload;
 
     function Serialize: TJSONObject;
 
     property QueryType: TQueryType read GetQueryType write SetQueryType;
-    property Table    : ITable     read GetTable     write SetTable;
+    property Table    : TTable     read GetTable     write SetTable;
   end;
 
-  TSelectQuery = class(TQuery, ISelectQuery)
+  TSelectQuery = class(TQuery)
   private
-    aColumns  : TArray<IColumn>;
-    aJoins    : TArray<IJoin>;
-    aOrderBy  : TArray<IColumn>;
+    aColumns  : TArray<TColumn>;
+    aJoins    : TArray<TJoin>;
+    aOrderBy  : TArray<TColumn>;
     sSQL      : string;
 
-    procedure AddJoin(pJoin: IJoin);
+    procedure AddJoin(pJoin: TJoin);
     function GenerateSQL: string; override;
   public
     constructor Create(pTable: string); overload;
-    constructor Create(pTable: ITable); overload;
+    constructor Create(pTable: TTable); overload;
 
-    function SetColumns(pColumns: TArray<IColumn>): ISelectQuery; overload;
-    function SetColumns(pColumns: TArray<string>): ISelectQuery; overload;
+    function SetColumns(pColumns: TArray<TColumn>): TSelectQuery; overload;
+    function SetColumns(pColumns: TArray<string>): TSelectQuery; overload;
 
-    function Join(pJoinType: TJoinType; pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function Join(pJoinType: TJoinType; pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function Join(pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function Join(pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function InnerJoin(pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function InnerJoin(pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function LeftJoin(pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function LeftJoin(pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function RightJoin(pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function RightJoin(pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function OuterJoin(pTable: ITable; pConditions: TArray<ICondition>): ISelectQuery; overload;
-    function OuterJoin(pTable: string; pConditions: TArray<ICondition>): ISelectQuery; overload;
+    function Join(pJoinType: TJoinType; pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function Join(pJoinType: TJoinType; pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function Join(pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function Join(pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function InnerJoin(pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function InnerJoin(pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function LeftJoin(pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function LeftJoin(pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function RightJoin(pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function RightJoin(pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function OuterJoin(pTable: TTable; pConditions: TArray<TCondition>): TSelectQuery; overload;
+    function OuterJoin(pTable: string; pConditions: TArray<TCondition>): TSelectQuery; overload;
 
-    function Where(pCond: string): ISelectQuery; overload;
-    function Where(pLeftField, pRightField: string): ISelectQuery; overload;
-    function Where(pLeftField, pCond, pRightField: string): ISelectQuery; overload;
-    function Where(pLeftField, pCond: string; pValues: TArray<string>): ISelectQuery; overload;
-    function Where(pLeftField, pRightField: IColumn): ISelectQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pRightField: IColumn): ISelectQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pValues: TArray<string>): ISelectQuery; overload;
-    function WhereIn(pLeftField: string; pValues: TArray<string>): ISelectQuery; overload;
-    function WhereIn(pLeftField: IColumn; pValues: TArray<string>): ISelectQuery; overload;
-    function WhereNotIn(pLeftField: string; pValues: TArray<string>): ISelectQuery; overload;
-    function WhereNotIn(pLeftField: IColumn; pValues: TArray<string>): ISelectQuery; overload;
+    function Where(pCond: string): TSelectQuery; overload;
+    function Where(pLeftField, pRightField: string): TSelectQuery; overload;
+    function Where(pLeftField, pCond, pRightField: string): TSelectQuery; overload;
+    function Where(pLeftField, pCond: string; pValues: TArray<string>): TSelectQuery; overload;
+    function Where(pLeftField, pRightField: TColumn): TSelectQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pRightField: TColumn): TSelectQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TSelectQuery; overload;
+    function WhereIn(pLeftField: string; pValues: TArray<string>): TSelectQuery; overload;
+    function WhereIn(pLeftField: TColumn; pValues: TArray<string>): TSelectQuery; overload;
+    function WhereNotIn(pLeftField: string; pValues: TArray<string>): TSelectQuery; overload;
+    function WhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TSelectQuery; overload;
 
-    function OrWhere(pCond: string): ISelectQuery; overload;
-    function OrWhere(pLeftField, pRightField: string): ISelectQuery; overload;
-    function OrWhere(pLeftField, pCond, pRightField: string): ISelectQuery; overload;
-    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): ISelectQuery; overload;
-    function OrWhere(pLeftField, pRightField: IColumn): ISelectQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pRightField: IColumn): ISelectQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pValues: TArray<string>): ISelectQuery; overload;
-    function OrWhereIn(pLeftField: string; pValues: TArray<string>): ISelectQuery; overload;
-    function OrWhereIn(pLeftField: IColumn; pValues: TArray<string>): ISelectQuery; overload;
-    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): ISelectQuery; overload;
-    function OrWhereNotIn(pLeftField: IColumn; pValues: TArray<string>): ISelectQuery; overload;
+    function OrWhere(pCond: string): TSelectQuery; overload;
+    function OrWhere(pLeftField, pRightField: string): TSelectQuery; overload;
+    function OrWhere(pLeftField, pCond, pRightField: string): TSelectQuery; overload;
+    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): TSelectQuery; overload;
+    function OrWhere(pLeftField, pRightField: TColumn): TSelectQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pRightField: TColumn): TSelectQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TSelectQuery; overload;
+    function OrWhereIn(pLeftField: string; pValues: TArray<string>): TSelectQuery; overload;
+    function OrWhereIn(pLeftField: TColumn; pValues: TArray<string>): TSelectQuery; overload;
+    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): TSelectQuery; overload;
+    function OrWhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TSelectQuery; overload;
 
-    function OrderBy(pColumn: IColumn): ISelectQuery; overload;
-    function OrderBy(pColumn: string): ISelectQuery; overload;
-    function OrderBy(pColumns: TArray<IColumn>): ISelectQuery; overload;
-    function OrderBy(pColumns: TArray<string>): ISelectQuery; overload;
+    function OrderBy(pColumn: TColumn): TSelectQuery; overload;
+    function OrderBy(pColumn: string): TSelectQuery; overload;
+    function OrderBy(pColumns: TArray<TColumn>): TSelectQuery; overload;
+    function OrderBy(pColumns: TArray<string>): TSelectQuery; overload;
 
     function GetSQL: string; overload;
-    function GetSQL(pColumns: TArray<IColumn>): string; overload;
+    function GetSQL(pColumns: TArray<TColumn>): string; overload;
     function GetSQL(pColumns: TArray<string>): string; overload;
 
     function Serialize: TJSONObject;
@@ -124,64 +123,37 @@ type
     property Table;
   end;
 
-  TDeleteQuery = class(TQuery, IDeleteQuery)
+  TDeleteQuery = class(TQuery)
   private
     sSQL: string;
     function GenerateSQL: string; override;
   public
     constructor Create(pTable: string); overload;
-    constructor Create(pTable: ITable); overload;
+    constructor Create(pTable: TTable); overload;
 
-    function Where(pCond: string): IDeleteQuery; overload;
-    function Where(pLeftField, pRightField: string): IDeleteQuery; overload;
-    function Where(pLeftField, pCond, pRightField: string): IDeleteQuery; overload;
-    function Where(pLeftField, pCond: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function Where(pLeftField, pRightField: IColumn): IDeleteQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pRightField: IColumn): IDeleteQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function WhereIn(pLeftField: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function WhereIn(pLeftField: IColumn; pValues: TArray<string>): IDeleteQuery; overload;
-    function WhereNotIn(pLeftField: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function WhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IDeleteQuery; overload;
+    function Where(pCond: string): TDeleteQuery; overload;
+    function Where(pLeftField, pRightField: string): TDeleteQuery; overload;
+    function Where(pLeftField, pCond, pRightField: string): TDeleteQuery; overload;
+    function Where(pLeftField, pCond: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function Where(pLeftField, pRightField: TColumn): TDeleteQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pRightField: TColumn): TDeleteQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function WhereIn(pLeftField: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function WhereIn(pLeftField: TColumn; pValues: TArray<string>): TDeleteQuery; overload;
+    function WhereNotIn(pLeftField: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function WhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TDeleteQuery; overload;
 
-    function OrWhere(pCond: string): IDeleteQuery; overload;
-    function OrWhere(pLeftField, pRightField: string): IDeleteQuery; overload;
-    function OrWhere(pLeftField, pCond, pRightField: string): IDeleteQuery; overload;
-    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function OrWhere(pLeftField, pRightField: IColumn): IDeleteQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pRightField: IColumn): IDeleteQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function OrWhereIn(pLeftField: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function OrWhereIn(pLeftField: IColumn; pValues: TArray<string>): IDeleteQuery; overload;
-    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): IDeleteQuery; overload;
-    function OrWhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IDeleteQuery; overload;
-
-    function GetSQL: string;
-
-    function Serialize: TJSONObject;
-
-    property QueryType;
-    property Table;
-  end;
-
-  TInsertQuery = class(TQuery, IInsertQuery)
-  private
-    sSQL  : string;
-    aPairs: TArray<IPair>;
-
-    procedure AddPair(pColumn: IColumn; pValue: TValue);
-    function GenerateSQL: string; override;
-  public
-    constructor Create(pTable: string); overload;
-    constructor Create(pTable: ITable); overload;
-
-    function SetPair(pColumn, pValue: string): IInsertQuery; overload;
-    function SetPair(pColumn: string; pValue: TValue): IInsertQuery; overload;
-    function SetPair(pColumn: IColumn; pValue: string): IInsertQuery; overload;
-    function SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery; overload;
-
-    function SetNullPair(pColumn: string): IInsertQuery; overload;
-    function SetNullPair(pColumn: IColumn): IInsertQuery; overload;
+    function OrWhere(pCond: string): TDeleteQuery; overload;
+    function OrWhere(pLeftField, pRightField: string): TDeleteQuery; overload;
+    function OrWhere(pLeftField, pCond, pRightField: string): TDeleteQuery; overload;
+    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function OrWhere(pLeftField, pRightField: TColumn): TDeleteQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pRightField: TColumn): TDeleteQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function OrWhereIn(pLeftField: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function OrWhereIn(pLeftField: TColumn; pValues: TArray<string>): TDeleteQuery; overload;
+    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): TDeleteQuery; overload;
+    function OrWhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TDeleteQuery; overload;
 
     function GetSQL: string;
 
@@ -191,48 +163,75 @@ type
     property Table;
   end;
 
-  TUpdateQuery = class(TQuery, IUpdateQuery)
+  TInsertQuery = class(TQuery)
   private
     sSQL  : string;
-    aPairs: TArray<IPair>;
+    aPairs: TArray<TPair>;
 
-    procedure AddPair(pColumn: IColumn; pValue: TValue);
+    procedure AddPair(pColumn: TColumn; pValue: TValue);
     function GenerateSQL: string; override;
   public
     constructor Create(pTable: string); overload;
-    constructor Create(pTable: ITable); overload;
+    constructor Create(pTable: TTable); overload;
 
-    function Where(pCond: string): IUpdateQuery; overload;
-    function Where(pLeftField, pRightField: string): IUpdateQuery; overload;
-    function Where(pLeftField, pCond, pRightField: string): IUpdateQuery; overload;
-    function Where(pLeftField, pCond: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function Where(pLeftField, pRightField: IColumn): IUpdateQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pRightField: IColumn): IUpdateQuery; overload;
-    function Where(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function WhereIn(pLeftField: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function WhereIn(pLeftField: IColumn; pValues: TArray<string>): IUpdateQuery; overload;
-    function WhereNotIn(pLeftField: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function WhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IUpdateQuery; overload;
+    function SetPair(pColumn, pValue: string): TInsertQuery; overload;
+    function SetPair(pColumn: string; pValue: TValue): TInsertQuery; overload;
+    function SetPair(pColumn: TColumn; pValue: string): TInsertQuery; overload;
+    function SetPair(pColumn: TColumn; pValue: TValue): TInsertQuery; overload;
 
-    function OrWhere(pCond: string): IUpdateQuery; overload;
-    function OrWhere(pLeftField, pRightField: string): IUpdateQuery; overload;
-    function OrWhere(pLeftField, pCond, pRightField: string): IUpdateQuery; overload;
-    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function OrWhere(pLeftField, pRightField: IColumn): IUpdateQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pRightField: IColumn): IUpdateQuery; overload;
-    function OrWhere(pLeftField: IColumn; pCond: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function OrWhereIn(pLeftField: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function OrWhereIn(pLeftField: IColumn; pValues: TArray<string>): IUpdateQuery; overload;
-    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): IUpdateQuery; overload;
-    function OrWhereNotIn(pLeftField: IColumn; pValues: TArray<string>): IUpdateQuery; overload;
+    function SetNullPair(pColumn: string): TInsertQuery; overload;
+    function SetNullPair(pColumn: TColumn): TInsertQuery; overload;
 
-    function SetPair(pColumn, pValue: string): IUpdateQuery; overload;
-    function SetPair(pColumn: string; pValue: TValue): IUpdateQuery; overload;
-    function SetPair(pColumn: IColumn; pValue: string): IUpdateQuery; overload;
-    function SetPair(pColumn: IColumn; pValue: TValue): IUpdateQuery; overload;
+    function GetSQL: string;
 
-    function SetNullPair(pColumn: string): IUpdateQuery; overload;
-    function SetNullPair(pColumn: IColumn): IUpdateQuery; overload;
+    function Serialize: TJSONObject;
+
+    property QueryType;
+    property Table;
+  end;
+
+  TUpdateQuery = class(TQuery)
+  private
+    sSQL  : string;
+    aPairs: TArray<TPair>;
+
+    procedure AddPair(pColumn: TColumn; pValue: TValue);
+    function GenerateSQL: string; override;
+  public
+    constructor Create(pTable: string); overload;
+    constructor Create(pTable: TTable); overload;
+
+    function Where(pCond: string): TUpdateQuery; overload;
+    function Where(pLeftField, pRightField: string): TUpdateQuery; overload;
+    function Where(pLeftField, pCond, pRightField: string): TUpdateQuery; overload;
+    function Where(pLeftField, pCond: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function Where(pLeftField, pRightField: TColumn): TUpdateQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pRightField: TColumn): TUpdateQuery; overload;
+    function Where(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function WhereIn(pLeftField: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function WhereIn(pLeftField: TColumn; pValues: TArray<string>): TUpdateQuery; overload;
+    function WhereNotIn(pLeftField: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function WhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TUpdateQuery; overload;
+
+    function OrWhere(pCond: string): TUpdateQuery; overload;
+    function OrWhere(pLeftField, pRightField: string): TUpdateQuery; overload;
+    function OrWhere(pLeftField, pCond, pRightField: string): TUpdateQuery; overload;
+    function OrWhere(pLeftField, pCond: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function OrWhere(pLeftField, pRightField: TColumn): TUpdateQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pRightField: TColumn): TUpdateQuery; overload;
+    function OrWhere(pLeftField: TColumn; pCond: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function OrWhereIn(pLeftField: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function OrWhereIn(pLeftField: TColumn; pValues: TArray<string>): TUpdateQuery; overload;
+    function OrWhereNotIn(pLeftField: string; pValues: TArray<string>): TUpdateQuery; overload;
+    function OrWhereNotIn(pLeftField: TColumn; pValues: TArray<string>): TUpdateQuery; overload;
+
+    function SetPair(pColumn, pValue: string): TUpdateQuery; overload;
+    function SetPair(pColumn: string; pValue: TValue): TUpdateQuery; overload;
+    function SetPair(pColumn: TColumn; pValue: string): TUpdateQuery; overload;
+    function SetPair(pColumn: TColumn; pValue: TValue): TUpdateQuery; overload;
+
+    function SetNullPair(pColumn: string): TUpdateQuery; overload;
+    function SetNullPair(pColumn: TColumn): TUpdateQuery; overload;
 
     function GetSQL: string;
 
@@ -250,7 +249,7 @@ begin
   begin
     AddPair('Type', Self.tQueryType.ToString);
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
+    AddPair('Where', TArrayUtils<TCondition>.SerializeArray(Self.aWhere));
   end;
 end;
 
@@ -259,14 +258,14 @@ begin
   Self.tQueryType := Value;
 end;
 
-procedure TQuery.SetTable(Value: ITable);
+procedure TQuery.SetTable(Value: TTable);
 begin
   Self.oTable := Value;
 end;
 
-procedure TQuery.AddWhere(pCondition: ICondition);
+procedure TQuery.AddWhere(pCondition: TCondition);
 begin
-  TArrayUtils<ICondition>.Append(Self.aWhere, pCondition);
+  TArrayUtils<TCondition>.Append(Self.aWhere, pCondition);
 end;
 
 constructor TQuery.Create(pTable: string);
@@ -274,7 +273,7 @@ begin
   Create(TTable.Create(pTable, 'a'));
 end;
 
-constructor TQuery.Create(pTable: ITable);
+constructor TQuery.Create(pTable: TTable);
 begin
   inherited Create;
   Self.oTable := pTable;
@@ -285,146 +284,146 @@ begin
   Result := Self.tQueryType;
 end;
 
-function TQuery.GetTable: ITable;
+function TQuery.GetTable: TTable;
 begin
   Result := Self.oTable;
 end;
 
-function TQuery.Where(pLeftField, pRightField: string): IQuery;
+function TQuery.Where(pLeftField, pRightField: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, '=', pRightField).Left('and'));
 end;
 
-function TQuery.Where(pCond: string): IQuery;
+function TQuery.Where(pCond: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pCond).Left('and'));
 end;
 
-function TQuery.Where(pLeftField, pCond, pRightField: string): IQuery;
+function TQuery.Where(pLeftField, pCond, pRightField: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pRightField).Left('and'));
 end;
 
-function TQuery.Where(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IQuery;
+function TQuery.Where(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pValues).Left('and'));
 end;
 
-function TQuery.Where(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IQuery;
+function TQuery.Where(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pRightField).Left('and'));
 end;
 
 function TQuery.Where(pLeftField, pCond: string;
-  pValues: TArray<string>): IQuery;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pValues).Left('and'));
 end;
 
-function TQuery.Where(pLeftField, pRightField: IColumn): IQuery;
+function TQuery.Where(pLeftField, pRightField: TColumn): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, '=', pRightField).Left('and'));
 end;
 
-function TQuery.WhereIn(pLeftField: string; pValues: TArray<string>): IQuery;
+function TQuery.WhereIn(pLeftField: string; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'in', pValues).Left('and'));
 end;
 
-function TQuery.WhereIn(pLeftField: IColumn; pValues: TArray<string>): IQuery;
+function TQuery.WhereIn(pLeftField: TColumn; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'in', pValues).Left('and'));
 end;
 
-function TQuery.WhereNotIn(pLeftField: string; pValues: TArray<string>): IQuery;
+function TQuery.WhereNotIn(pLeftField: string; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'not in', pValues).Left('and'));
 end;
 
-function TQuery.WhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IQuery;
+function TQuery.WhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'not in', pValues).Left('and'));
 end;
 
-function TQuery.OrWhere(pLeftField, pRightField: string): IQuery;
+function TQuery.OrWhere(pLeftField, pRightField: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, '=', pRightField).Left('or'));
 end;
 
-function TQuery.OrWhere(pCond: string): IQuery;
+function TQuery.OrWhere(pCond: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pCond).Left('or'));
 end;
 
-function TQuery.OrWhere(pLeftField, pCond, pRightField: string): IQuery;
+function TQuery.OrWhere(pLeftField, pCond, pRightField: string): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pRightField).Left('or'));
 end;
 
-function TQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IQuery;
+function TQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pValues).Left('or'));
 end;
 
-function TQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IQuery;
+function TQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pRightField).Left('or'));
 end;
 
 function TQuery.OrWhere(pLeftField, pCond: string;
-  pValues: TArray<string>): IQuery;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, pCond, pValues).Left('or'));
 end;
 
-function TQuery.OrWhere(pLeftField, pRightField: IColumn): IQuery;
+function TQuery.OrWhere(pLeftField, pRightField: TColumn): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, '=', pRightField).Left('or'));
 end;
 
-function TQuery.OrWhereIn(pLeftField: string; pValues: TArray<string>): IQuery;
+function TQuery.OrWhereIn(pLeftField: string; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'in', pValues).Left('or'));
 end;
 
-function TQuery.OrWhereIn(pLeftField: IColumn; pValues: TArray<string>): IQuery;
+function TQuery.OrWhereIn(pLeftField: TColumn; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'in', pValues).Left('or'));
 end;
 
-function TQuery.OrWhereNotIn(pLeftField: string; pValues: TArray<string>): IQuery;
+function TQuery.OrWhereNotIn(pLeftField: string; pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'not in', pValues).Left('or'));
 end;
 
-function TQuery.OrWhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IQuery;
+function TQuery.OrWhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TQuery;
 begin
   Result := Self;
   AddWhere(TCondition.Create(pLeftField, 'not in', pValues).Left('or'));
@@ -438,21 +437,21 @@ begin
   with Result do
   begin
     AddPair('Type', Self.tQueryType.ToString);
-    AddPair('Columns', TArrayUtils<IColumn>.SerializeArray(Self.aColumns));
+    AddPair('Columns', TArrayUtils<TColumn>.SerializeArray(Self.aColumns));
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Joins', TArrayUtils<IJoin>.SerializeArray(Self.aJoins));
-    AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
-    AddPair('OrderBy', TArrayUtils<IColumn>.SerializeArray(Self.aOrderBy));
+    AddPair('Joins', TArrayUtils<TJoin>.SerializeArray(Self.aJoins));
+    AddPair('Where', TArrayUtils<TCondition>.SerializeArray(Self.aWhere));
+    AddPair('OrderBy', TArrayUtils<TColumn>.SerializeArray(Self.aOrderBy));
   end;
 end;
 
-function TSelectQuery.SetColumns(pColumns: TArray<string>): ISelectQuery;
+function TSelectQuery.SetColumns(pColumns: TArray<string>): TSelectQuery;
 var
-  Columns: TArray<IColumn>;
+  Columns: TArray<TColumn>;
   Column : string;
 begin
   for Column in pColumns do
-    TArrayUtils<IColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
+    TArrayUtils<TColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
   Self.SetColumns(Columns);
   Result := Self;
 end;
@@ -463,12 +462,12 @@ begin
   Self.QueryType := qtSelect;
 end;
 
-procedure TSelectQuery.AddJoin(pJoin: IJoin);
+procedure TSelectQuery.AddJoin(pJoin: TJoin);
 begin
-  TArrayUtils<IJoin>.Append(Self.aJoins, pJoin);
+  TArrayUtils<TJoin>.Append(Self.aJoins, pJoin);
 end;
 
-constructor TSelectQuery.Create(pTable: ITable);
+constructor TSelectQuery.Create(pTable: TTable);
 begin
   inherited Create(pTable);
   Self.QueryType := qtSelect;
@@ -485,13 +484,13 @@ begin
       if i <> 0 then
         Self.sSQL := Self.sSQL + Spaces(7);
 
-      Self.sSQL := Self.sSQL + Coalesce([Self.aColumns[i].GetTableLabel, GetTableLabel(1)]) +
-          '.' + Self.aColumns[i].GetName + ',' + #13#10;
+      Self.sSQL := Self.sSQL + Coalesce([Self.aColumns[i].TableLabel, GetTableLabel(1)]) +
+          '.' + Self.aColumns[i].Name + ',' + #13#10;
     end;
 
     SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
 
-    Self.sSQL := Self.sSQL + #13#10 + 'from ' + Self.oTable.GetName + ' ' + Coalesce([Self.oTable.GetAlias, GetTableLabel(1)]);
+    Self.sSQL := Self.sSQL + #13#10 + 'from ' + Self.oTable.Name + ' ' + Coalesce([Self.oTable.Alias, GetTableLabel(1)]);
 
     if Length(Self.aJoins) > 0 then
     begin
@@ -514,8 +513,8 @@ begin
         if i <> 0 then
           Self.sSQL := Self.sSQL + Spaces(9);
 
-        Self.sSQL := Self.sSQL + Coalesce([Self.aOrderBy[i].GetTableLabel, oTable.GetAlias]) +
-            '.' + Self.aOrderBy[i].GetName + ',' + #13#10;
+        Self.sSQL := Self.sSQL + Coalesce([Self.aOrderBy[i].TableLabel, oTable.Alias]) +
+            '.' + Self.aOrderBy[i].Name + ',' + #13#10;
       end;
 
       SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
@@ -536,7 +535,7 @@ begin
   Result := GenerateSQL;
 end;
 
-function TSelectQuery.GetSQL(pColumns: TArray<IColumn>): string;
+function TSelectQuery.GetSQL(pColumns: TArray<TColumn>): string;
 begin
   Self.SetColumns(pColumns);
   Result := GetSQL;
@@ -544,273 +543,273 @@ end;
 
 function TSelectQuery.GetSQL(pColumns: TArray<string>): string;
 var
-  Columns: TArray<IColumn>;
+  Columns: TArray<TColumn>;
   Column : string;
 begin
   for Column in pColumns do
-    TArrayUtils<IColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
+    TArrayUtils<TColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
   Result := GetSQL(Columns);
 end;
 
 function TSelectQuery.InnerJoin(pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtInner, pTable, pConditions));
 end;
 
-function TSelectQuery.InnerJoin(pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.InnerJoin(pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtInner, pTable, pConditions));
 end;
 
 function TSelectQuery.Join(pJoinType: TJoinType; pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(pJoinType, pTable, pConditions));
 end;
 
-function TSelectQuery.Join(pJoinType: TJoinType; pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.Join(pJoinType: TJoinType; pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(pJoinType, pTable, pConditions));
 end;
 
 function TSelectQuery.Join(pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtNone, pTable, pConditions));
 end;
 
-function TSelectQuery.Join(pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.Join(pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtNone, pTable, pConditions));
 end;
 
-function TSelectQuery.LeftJoin(pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.LeftJoin(pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtLeft, pTable, pConditions));
 end;
 
 function TSelectQuery.LeftJoin(pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtLeft, pTable, pConditions));
 end;
 
-function TSelectQuery.OuterJoin(pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.OuterJoin(pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtOuter, pTable, pConditions));
 end;
 
-function TSelectQuery.OrderBy(pColumn: IColumn): ISelectQuery;
+function TSelectQuery.OrderBy(pColumn: TColumn): TSelectQuery;
 begin
   Result := OrderBy([pColumn]);
 end;
 
-function TSelectQuery.OrderBy(pColumn: string): ISelectQuery;
+function TSelectQuery.OrderBy(pColumn: string): TSelectQuery;
 begin
   Result := OrderBy(TColumn.Create(pColumn, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
 end;
 
-function TSelectQuery.OrderBy(pColumns: TArray<IColumn>): ISelectQuery;
+function TSelectQuery.OrderBy(pColumns: TArray<TColumn>): TSelectQuery;
 begin
   Result := Self;
-  TArrayUtils<IColumn>.Append(aOrderBy, pColumns);
+  TArrayUtils<TColumn>.Append(aOrderBy, pColumns);
 end;
 
-function TSelectQuery.OrderBy(pColumns: TArray<string>): ISelectQuery;
+function TSelectQuery.OrderBy(pColumns: TArray<string>): TSelectQuery;
 var
-  Columns: TArray<IColumn>;
+  Columns: TArray<TColumn>;
   Column : string;
 begin
   for Column in pColumns do
-    TArrayUtils<IColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
+    TArrayUtils<TColumn>.Append(Columns, TColumn.Create(Column, ctUnknown, -1, -1, False, '', '', TValue.From<Variant>(Null)));
   Result := OrderBy(Columns);
 end;
 
 function TSelectQuery.OrWhere(pLeftField, pCond,
-  pRightField: string): ISelectQuery;
+  pRightField: string): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhere(pLeftField, pRightField: string): ISelectQuery;
+function TSelectQuery.OrWhere(pLeftField, pRightField: string): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhere(pCond: string): ISelectQuery;
+function TSelectQuery.OrWhere(pCond: string): TSelectQuery;
 begin
   inherited OrWhere(pCond);
   Result := Self;
 end;
 
 function TSelectQuery.OrWhere(pLeftField, pCond: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): ISelectQuery;
+function TSelectQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhere(pLeftField, pRightField: IColumn): ISelectQuery;
+function TSelectQuery.OrWhere(pLeftField, pRightField: TColumn): TSelectQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TSelectQuery.OrWhereIn(pLeftField: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.OrWhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.OrWhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.OrWhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TSelectQuery.OrWhereNotIn(pLeftField: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited OrWhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TSelectQuery.OuterJoin(pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtOuter, pTable, pConditions));
 end;
 
-function TSelectQuery.RightJoin(pTable: ITable;
-  pConditions: TArray<ICondition>): ISelectQuery;
+function TSelectQuery.RightJoin(pTable: TTable;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtRight, pTable, pConditions));
 end;
 
 function TSelectQuery.RightJoin(pTable: string;
-  pConditions: TArray<ICondition>): ISelectQuery;
+  pConditions: TArray<TCondition>): TSelectQuery;
 begin
   Result := Self;
   AddJoin(TJoin.Create(jtRight, pTable, pConditions));
 end;
 
-function TSelectQuery.SetColumns(pColumns: TArray<IColumn>): ISelectQuery;
+function TSelectQuery.SetColumns(pColumns: TArray<TColumn>): TSelectQuery;
 begin
   aColumns := pColumns;
   Result   := Self;
 end;
 
-function TSelectQuery.Where(pLeftField, pRightField: string): ISelectQuery;
+function TSelectQuery.Where(pLeftField, pRightField: string): TSelectQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TSelectQuery.Where(pCond: string): ISelectQuery;
+function TSelectQuery.Where(pCond: string): TSelectQuery;
 begin
   inherited Where(pCond);
   Result := Self;
 end;
 
 function TSelectQuery.Where(pLeftField, pCond,
-  pRightField: string): ISelectQuery;
+  pRightField: string): TSelectQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TSelectQuery.Where(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.Where(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.Where(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): ISelectQuery;
+function TSelectQuery.Where(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TSelectQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
 function TSelectQuery.Where(pLeftField, pCond: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.Where(pLeftField, pRightField: IColumn): ISelectQuery;
+function TSelectQuery.Where(pLeftField, pRightField: TColumn): TSelectQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TSelectQuery.WhereIn(pLeftField: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.WhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.WhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TSelectQuery.WhereNotIn(pLeftField: string;
-  pValues: TArray<string>): ISelectQuery;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TSelectQuery.WhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): ISelectQuery;
+function TSelectQuery.WhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TSelectQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
@@ -824,7 +823,7 @@ begin
   Self.tQueryType := qtDelete;
 end;
 
-constructor TDeleteQuery.Create(pTable: ITable);
+constructor TDeleteQuery.Create(pTable: TTable);
 begin
   inherited Create(pTable);
   Self.tQueryType := qtDelete;
@@ -837,7 +836,7 @@ begin
   begin
     AddPair('Type', Self.tQueryType.ToString);
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
+    AddPair('Where', TArrayUtils<TCondition>.SerializeArray(Self.aWhere));
   end;
 end;
 
@@ -846,7 +845,7 @@ var
   i: Integer;
 begin
   try
-    sSQL := 'delete from ' + oTable.GetName + ' ' + oTable.GetAlias;
+    sSQL := 'delete from ' + oTable.Name + ' ' + oTable.Alias;
 
     if Length(aWhere) > 0 then
     begin
@@ -871,148 +870,148 @@ begin
 end;
 
 function TDeleteQuery.OrWhere(pLeftField, pCond,
-  pRightField: string): IDeleteQuery;
+  pRightField: string): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhere(pLeftField, pRightField: string): IDeleteQuery;
+function TDeleteQuery.OrWhere(pLeftField, pRightField: string): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhere(pCond: string): IDeleteQuery;
+function TDeleteQuery.OrWhere(pCond: string): TDeleteQuery;
 begin
   inherited OrWhere(pCond);
   Result := Self;
 end;
 
 function TDeleteQuery.OrWhere(pLeftField, pCond: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IDeleteQuery;
+function TDeleteQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhere(pLeftField, pRightField: IColumn): IDeleteQuery;
+function TDeleteQuery.OrWhere(pLeftField, pRightField: TColumn): TDeleteQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TDeleteQuery.OrWhereIn(pLeftField: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.OrWhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.OrWhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.OrWhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TDeleteQuery.OrWhereNotIn(pLeftField: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited OrWhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.Where(pLeftField, pRightField: string): IDeleteQuery;
+function TDeleteQuery.Where(pLeftField, pRightField: string): TDeleteQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TDeleteQuery.Where(pCond: string): IDeleteQuery;
+function TDeleteQuery.Where(pCond: string): TDeleteQuery;
 begin
   inherited Where(pCond);
   Result := Self;
 end;
 
 function TDeleteQuery.Where(pLeftField, pCond,
-  pRightField: string): IDeleteQuery;
+  pRightField: string): TDeleteQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TDeleteQuery.Where(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.Where(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.Where(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IDeleteQuery;
+function TDeleteQuery.Where(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TDeleteQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
 function TDeleteQuery.Where(pLeftField, pCond: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.Where(pLeftField, pRightField: IColumn): IDeleteQuery;
+function TDeleteQuery.Where(pLeftField, pRightField: TColumn): TDeleteQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TDeleteQuery.WhereIn(pLeftField: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.WhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.WhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TDeleteQuery.WhereNotIn(pLeftField: string;
-  pValues: TArray<string>): IDeleteQuery;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TDeleteQuery.WhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IDeleteQuery;
+function TDeleteQuery.WhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TDeleteQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
@@ -1026,50 +1025,50 @@ begin
   with Result do
   begin
     AddPair('Type', Self.tQueryType.ToString);
-    AddPair('Pairs', TArrayUtils<IPair>.SerializeArray(Self.aPairs));
+    AddPair('Pairs', TArrayUtils<TPair>.SerializeArray(Self.aPairs));
     AddPair('Table', Self.oTable.Serialize);
   end;
 end;
 
-function TInsertQuery.SetNullPair(pColumn: IColumn): IInsertQuery;
+function TInsertQuery.SetNullPair(pColumn: TColumn): TInsertQuery;
 begin
   Self.AddPair(pColumn, 'null');
   Result := Self;
 end;
 
-function TInsertQuery.SetNullPair(pColumn: string): IInsertQuery;
+function TInsertQuery.SetNullPair(pColumn: string): TInsertQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), 'null');
   Result := Self;
 end;
 
-function TInsertQuery.SetPair(pColumn: IColumn; pValue: TValue): IInsertQuery;
+function TInsertQuery.SetPair(pColumn: TColumn; pValue: TValue): TInsertQuery;
 begin
   Self.AddPair(pColumn, pValue);
   Result := Self;
 end;
 
-function TInsertQuery.SetPair(pColumn, pValue: string): IInsertQuery;
+function TInsertQuery.SetPair(pColumn, pValue: string): TInsertQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
   Result := Self;
 end;
 
-function TInsertQuery.SetPair(pColumn: string; pValue: TValue): IInsertQuery;
+function TInsertQuery.SetPair(pColumn: string; pValue: TValue): TInsertQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
   Result := Self;
 end;
 
-function TInsertQuery.SetPair(pColumn: IColumn; pValue: string): IInsertQuery;
+function TInsertQuery.SetPair(pColumn: TColumn; pValue: string): TInsertQuery;
 begin
   Self.AddPair(pColumn, pValue);
   Result := Self;
 end;
 
-procedure TInsertQuery.AddPair(pColumn: IColumn; pValue: TValue);
+procedure TInsertQuery.AddPair(pColumn: TColumn; pValue: TValue);
 begin
-  TArrayUtils<IPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
+  TArrayUtils<TPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
 end;
 
 constructor TInsertQuery.Create(pTable: string);
@@ -1078,7 +1077,7 @@ begin
   Self.tQueryType := qtInsert;
 end;
 
-constructor TInsertQuery.Create(pTable: ITable);
+constructor TInsertQuery.Create(pTable: TTable);
 begin
   inherited Create(pTable);
   Self.tQueryType := qtInsert;
@@ -1089,13 +1088,13 @@ var
   i: Integer;
 begin
   try
-    Self.sSQL := 'insert into ' + Self.oTable.GetName + ' (';
+    Self.sSQL := 'insert into ' + Self.oTable.Name + ' (';
     for i := 0 to (Length(Self.aPairs) - 1) do
     begin
       if i <> 0 then
-        Self.sSQL := Self.sSQL + Spaces(Length('insert into ' + Self.oTable.GetName + ' ('));
+        Self.sSQL := Self.sSQL + Spaces(Length('insert into ' + Self.oTable.Name + ' ('));
 
-      Self.sSQL := Self.sSQL + Self.aPairs[i].GetColumn.GetName + ',' + #13#10;
+      Self.sSQL := Self.sSQL + Self.aPairs[i].Column.Name + ',' + #13#10;
     end;
 
     SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
@@ -1107,7 +1106,7 @@ begin
       if i <> 0 then
         Self.sSQL := Self.sSQL + Spaces(8);
 
-      Self.sSQL := Self.sSQL + Self.aPairs[i].GetValue.ToSQL + ',' + #13#10;
+      Self.sSQL := Self.sSQL + Self.aPairs[i].Value.ToSQL + ',' + #13#10;
     end;
 
     SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
@@ -1138,47 +1137,47 @@ begin
   begin
     AddPair('Type', Self.tQueryType.ToString);
     AddPair('Table', Self.oTable.Serialize);
-    AddPair('Joins', TArrayUtils<IPair>.SerializeArray(Self.aPairs));
-    AddPair('Where', TArrayUtils<ICondition>.SerializeArray(Self.aWhere));
+    AddPair('Joins', TArrayUtils<TPair>.SerializeArray(Self.aPairs));
+    AddPair('Where', TArrayUtils<TCondition>.SerializeArray(Self.aWhere));
   end;
 end;
 
-procedure TUpdateQuery.AddPair(pColumn: IColumn; pValue: TValue);
+procedure TUpdateQuery.AddPair(pColumn: TColumn; pValue: TValue);
 begin
-  TArrayUtils<IPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
+  TArrayUtils<TPair>.Append(Self.aPairs, TPair.Create(pColumn, pValue));
 end;
 
-function TUpdateQuery.SetNullPair(pColumn: string): IUpdateQuery;
+function TUpdateQuery.SetNullPair(pColumn: string): TUpdateQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), 'null');
   Result := Self;
 end;
 
-function TUpdateQuery.SetNullPair(pColumn: IColumn): IUpdateQuery;
+function TUpdateQuery.SetNullPair(pColumn: TColumn): TUpdateQuery;
 begin
   Self.AddPair(pColumn, 'null');
   Result := Self;
 end;
 
-function TUpdateQuery.SetPair(pColumn: string; pValue: TValue): IUpdateQuery;
+function TUpdateQuery.SetPair(pColumn: string; pValue: TValue): TUpdateQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), pValue);
   Result := Self;
 end;
 
-function TUpdateQuery.SetPair(pColumn, pValue: string): IUpdateQuery;
+function TUpdateQuery.SetPair(pColumn, pValue: string): TUpdateQuery;
 begin
   Self.AddPair(TVarcharColumn.Create(pColumn, -1), TValue.From(pValue));
   Result := Self;
 end;
 
-function TUpdateQuery.SetPair(pColumn: IColumn; pValue: string): IUpdateQuery;
+function TUpdateQuery.SetPair(pColumn: TColumn; pValue: string): TUpdateQuery;
 begin
   Self.AddPair(pColumn, TValue.From(pValue));
   Result := Self;
 end;
 
-function TUpdateQuery.SetPair(pColumn: IColumn; pValue: TValue): IUpdateQuery;
+function TUpdateQuery.SetPair(pColumn: TColumn; pValue: TValue): TUpdateQuery;
 begin
   Self.AddPair(pColumn, pValue);
   Result := Self;
@@ -1190,7 +1189,7 @@ begin
   Self.tQueryType := qtUpdate;
 end;
 
-constructor TUpdateQuery.Create(pTable: ITable);
+constructor TUpdateQuery.Create(pTable: TTable);
 begin
   inherited Create(pTable);
   Self.tQueryType := qtUpdate;
@@ -1201,15 +1200,15 @@ var
   i: Integer;
 begin
   try
-    Self.sSQL := 'update ' + Self.oTable.GetName + ' ' +
-        Coalesce([Self.oTable.GetAlias, GetTableLabel(1)]) + #13#10 + 'set ';
+    Self.sSQL := 'update ' + Self.oTable.Name + ' ' +
+        Coalesce([Self.oTable.Alias, GetTableLabel(1)]) + #13#10 + 'set ';
     for i := 0 to (Length(Self.aPairs) - 1) do
     begin
       if i <> 0 then
         Self.sSQL := Self.sSQL + Spaces(4);
 
-      Self.sSQL := Self.sSQL + Coalesce([Self.aPairs[i].GetColumn.GetTableLabel, GetTableLabel(1)]) +
-          '.' + Self.aPairs[i].GetColumn.GetName + ' = ' + Self.aPairs[i].GetValue.ToSQL + ',' + #13#10;
+      Self.sSQL := Self.sSQL + Coalesce([Self.aPairs[i].Column.TableLabel, GetTableLabel(1)]) +
+          '.' + Self.aPairs[i].Column.Name + ' = ' + Self.aPairs[i].Value.ToSQL + ',' + #13#10;
     end;
 
     SetLength(Self.sSQL, Length(Self.sSQL) - Length(',' + #13#10));
@@ -1237,148 +1236,148 @@ begin
 end;
 
 function TUpdateQuery.OrWhere(pLeftField, pCond,
-  pRightField: string): IUpdateQuery;
+  pRightField: string): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhere(pLeftField, pRightField: string): IUpdateQuery;
+function TUpdateQuery.OrWhere(pLeftField, pRightField: string): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhere(pCond: string): IUpdateQuery;
+function TUpdateQuery.OrWhere(pCond: string): TUpdateQuery;
 begin
   inherited OrWhere(pCond);
   Result := Self;
 end;
 
 function TUpdateQuery.OrWhere(pLeftField, pCond: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhere(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IUpdateQuery;
+function TUpdateQuery.OrWhere(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhere(pLeftField, pRightField: IColumn): IUpdateQuery;
+function TUpdateQuery.OrWhere(pLeftField, pRightField: TColumn): TUpdateQuery;
 begin
   inherited OrWhere(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TUpdateQuery.OrWhereIn(pLeftField: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.OrWhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited OrWhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.OrWhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.OrWhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TUpdateQuery.OrWhereNotIn(pLeftField: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited OrWhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.Where(pLeftField, pRightField: string): IUpdateQuery;
+function TUpdateQuery.Where(pLeftField, pRightField: string): TUpdateQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
-function TUpdateQuery.Where(pCond: string): IUpdateQuery;
+function TUpdateQuery.Where(pCond: string): TUpdateQuery;
 begin
   inherited Where(pCond);
   Result := Self;
 end;
 
 function TUpdateQuery.Where(pLeftField, pCond,
-  pRightField: string): IUpdateQuery;
+  pRightField: string): TUpdateQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
-function TUpdateQuery.Where(pLeftField: IColumn; pCond: string;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.Where(pLeftField: TColumn; pCond: string;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.Where(pLeftField: IColumn; pCond: string;
-  pRightField: IColumn): IUpdateQuery;
+function TUpdateQuery.Where(pLeftField: TColumn; pCond: string;
+  pRightField: TColumn): TUpdateQuery;
 begin
   inherited Where(pLeftField, pCond, pRightField);
   Result := Self;
 end;
 
 function TUpdateQuery.Where(pLeftField, pCond: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited Where(pLeftField, pCond, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.Where(pLeftField, pRightField: IColumn): IUpdateQuery;
+function TUpdateQuery.Where(pLeftField, pRightField: TColumn): TUpdateQuery;
 begin
   inherited Where(pLeftField, pRightField);
   Result := Self;
 end;
 
 function TUpdateQuery.WhereIn(pLeftField: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.WhereIn(pLeftField: IColumn;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.WhereIn(pLeftField: TColumn;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited WhereIn(pLeftField, pValues);
   Result := Self;
 end;
 
 function TUpdateQuery.WhereNotIn(pLeftField: string;
-  pValues: TArray<string>): IUpdateQuery;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;
 end;
 
-function TUpdateQuery.WhereNotIn(pLeftField: IColumn;
-  pValues: TArray<string>): IUpdateQuery;
+function TUpdateQuery.WhereNotIn(pLeftField: TColumn;
+  pValues: TArray<string>): TUpdateQuery;
 begin
   inherited WhereNotIn(pLeftField, pValues);
   Result := Self;

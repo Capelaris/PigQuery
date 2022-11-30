@@ -3,11 +3,10 @@ unit PigQuery.Core.Condition;
 interface
 
 uses
-  PigQuery.Commons, PigQuery.Interfaces, PigQuery.Helpers, PigQuery.Core.Columns,
-  SysUtils, JSON;
+  PigQuery.Commons, PigQuery.Helpers, PigQuery.Core.Columns, SysUtils, JSON;
 
 type
-  TCondition = class(TInterfacedObject, ICondition, ISerializable)
+  TCondition = class
   private
     sCondition    : string;
     sLeftCondition: string;
@@ -22,12 +21,12 @@ type
     constructor Create(LeftField, Cond, RightField: string); overload;
     constructor Create(LeftField: string; Values: TArray<string>); overload;
     constructor Create(LeftField, Cond: string; Values: TArray<string>); overload;
-    constructor Create(LeftField, RightField: IColumn); overload;
-    constructor Create(LeftField: IColumn; Cond: string; RightField: IColumn); overload;
-    constructor Create(LeftField: IColumn; Values: TArray<string>); overload;
-    constructor Create(LeftField: IColumn; Cond: string; Values: TArray<string>); overload;
+    constructor Create(LeftField, RightField: TColumn); overload;
+    constructor Create(LeftField: TColumn; Cond: string; RightField: TColumn); overload;
+    constructor Create(LeftField: TColumn; Values: TArray<string>); overload;
+    constructor Create(LeftField: TColumn; Cond: string; Values: TArray<string>); overload;
 
-    function Left(pCond: string): ICondition;
+    function Left(pCond: string): TCondition;
     function GenerateSQL(pSpaces: Integer = 0; pLeftCond: Boolean = False): string;
     function Serialize: TJSONObject;
 
@@ -74,18 +73,18 @@ begin
   Create(LeftField + ' ' + Cond + ' ' + ValueStr);
 end;
 
-constructor TCondition.Create(LeftField: IColumn; Cond: string;
-  RightField: IColumn);
+constructor TCondition.Create(LeftField: TColumn; Cond: string;
+  RightField: TColumn);
 begin
-  Create(LeftField.GetName, Cond, RightField.GetName);
+  Create(LeftField.Name, Cond, RightField.Name);
 end;
 
-constructor TCondition.Create(LeftField, RightField: IColumn);
+constructor TCondition.Create(LeftField, RightField: TColumn);
 begin
-  Create(LeftField.GetName, RightField.GetName);
+  Create(LeftField.Name, RightField.Name);
 end;
 
-function TCondition.Left(pCond: string): ICondition;
+function TCondition.Left(pCond: string): TCondition;
 begin
   Result := Self;
   Self.sLeftCondition := pCond;
@@ -111,10 +110,10 @@ begin
   Self.sLeftCondition := Value;
 end;
 
-constructor TCondition.Create(LeftField: IColumn; Cond: string;
+constructor TCondition.Create(LeftField: TColumn; Cond: string;
   Values: TArray<string>);
 begin
-  Create(LeftField.GetName, Cond, Values);
+  Create(LeftField.Name, Cond, Values);
 end;
 
 function TCondition.GenerateSQL(pSpaces: Integer; pLeftCond: Boolean): string;
@@ -135,9 +134,9 @@ begin
   Result := Self.sLeftCondition;
 end;
 
-constructor TCondition.Create(LeftField: IColumn; Values: TArray<string>);
+constructor TCondition.Create(LeftField: TColumn; Values: TArray<string>);
 begin
-  Create(LeftField.GetName, Values);
+  Create(LeftField.Name, Values);
 end;
 
 end.
