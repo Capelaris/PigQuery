@@ -56,15 +56,15 @@ type
     class function Copy(pObject: TColumn): TColumn;
     function Serialize: TJSONObject;
 
-    property Name      : string      read sName       write sName;
-    property TableLabel: string      read sTableLabel write sTableLabel;
-    property Size      : Integer     read iSize       write iSize;
-    property Scale     : Integer     read iScale      write iScale;
-    property NotNull   : Boolean     read bNotNull    write bNotNull;
-    property FieldType : TColumnType read tFieldType;
-    property Charset   : string      read sCharset    write sCharset;
-    property Collate   : string      read sCollate    write sCollate;
-    property DefaultVal: TValue      read oDefaultVal write oDefaultVal;
+    property Name      : string      read GetName       write SetName;
+    property TableLabel: string      read GetTableLabel write SetTableLabel;
+    property Size      : Integer     read GetSize       write SetSize;
+    property Scale     : Integer     read GetScale      write SetScale;
+    property NotNull   : Boolean     read GetNotNull    write SetNotNull;
+    property FieldType : TColumnType read GetFieldType  write SetFieldType;
+    property Charset   : string      read GetCharset    write SetCharset;
+    property Collate   : string      read GetCollate    write SetCollate;
+    property DefaultVal: TValue      read GetDefaultVal write SetDefaultVal;
   end;
 
   TSmallIntColumn = class(TColumn)

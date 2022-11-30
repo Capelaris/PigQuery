@@ -36,8 +36,13 @@ constructor TPair.Create(pColumn: TColumn; pValue: TValue);
 begin
   inherited Create;
   Self.oColumn  := pColumn;
-  if pValue.AsString = 'null' then
-    Self.oValue := pValue.From(nil)
+  if pValue.IsString then
+  begin
+    if pValue.AsString = 'null' then
+      Self.oValue := pValue.From(nil)
+    else
+      Self.oValue := pValue;
+  end
   else
     Self.oValue := pValue;
 end;

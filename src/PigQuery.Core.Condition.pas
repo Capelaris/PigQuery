@@ -30,7 +30,7 @@ type
     function GenerateSQL(pSpaces: Integer = 0; pLeftCond: Boolean = False): string;
     function Serialize: TJSONObject;
 
-    property Condition    : string read GetCondition;
+    property Condition    : string read GetCondition     write SetCondition;
     property LeftCondition: string read GetLeftCondition write SetLeftCondition;
   end;
 

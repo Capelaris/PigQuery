@@ -17,6 +17,11 @@ type
 
   TValueHelper = record helper for TValue
     function ToSQL: string;
+    function TypeName: string;
+    function IsString: Boolean;
+    function IsNumber: Boolean;
+    function IsInteger: Boolean;
+    function IsDouble: Boolean;
   end;
 
 function GetWords(Text: string): TArray<string>;
@@ -168,17 +173,56 @@ end;
 
 { TValueHelper }
 
+function TValueHelper.IsDouble: Boolean;
+begin
+  Result := False;
+  if Self.Kind in [tkEnumeration, tkFloat] then
+    Result := True;
+end;
+
+function TValueHelper.IsInteger: Boolean;
+begin
+  Result := False;
+  if Self.Kind in [tkInteger, tkInt64] then
+    Result := True;
+end;
+
+function TValueHelper.IsNumber: Boolean;
+begin
+  Result := False;
+  if Self.Kind in [tkInteger, tkInt64, tkEnumeration, tkFloat] then
+    Result := True;
+end;
+
+function TValueHelper.IsString: Boolean;
+begin
+  Result := False;
+  if Self.Kind in [tkChar, tkString, tkWChar, tkLString,
+      tkWString, tkUString, tkAnsiChar, tkWideChar, tkUnicodeString,
+      tkAnsiString, tkWideString, tkShortString, tkVariant] then
+    Result := True;
+end;
+
 function TValueHelper.ToSQL: string;
 begin
   Result := 'null';
-  if Self.Kind in [tkInteger, tkInt64] then
+  if Self.IsInteger then
     Result := IntToStr(Self.AsInt64)
-  else if Self.Kind in [tkEnumeration, tkFloat] then
+  else if Self.IsDouble then
     Result := FloatToStr(Self.AsExtended)
-  else if Self.Kind in [tkChar, tkString, tkWChar, tkLString,
-      tkWString, tkUString, tkAnsiChar, tkWideChar, tkUnicodeString,
-      tkAnsiString, tkWideString, tkShortString, tkVariant] then
+  else if Self.IsString then
     Result := QuotedStr(Self.AsString);
+end;
+
+function TValueHelper.TypeName: string;
+begin
+  Result := '';
+  if Self.IsInteger then
+    Result := 'Integer'
+  else if Self.IsDouble then
+    Result := 'double'
+  else if Self.IsString then
+    Result := 'string';
 end;
 
 end.
